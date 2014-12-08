@@ -45,13 +45,13 @@
             </subviews>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="pio-gw-44I" firstAttribute="top" secondItem="wzd-yS-yYU" secondAttribute="bottom" constant="61" id="EN7-TN-2SG"/>
+                <constraint firstAttribute="trailing" secondItem="pio-gw-44I" secondAttribute="trailing" constant="61" id="DFi-5y-tof"/>
                 <constraint firstItem="wzd-yS-yYU" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="285" id="LzL-Xi-AVs"/>
-                <constraint firstAttribute="trailing" secondItem="pio-gw-44I" secondAttribute="trailing" constant="100" id="hYf-yY-KnX"/>
+                <constraint firstItem="pio-gw-44I" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="62" id="UHD-Uq-ntu"/>
+                <constraint firstItem="pio-gw-44I" firstAttribute="top" secondItem="wzd-yS-yYU" secondAttribute="bottom" constant="63" id="khe-Se-GDb"/>
+                <constraint firstAttribute="bottom" secondItem="pio-gw-44I" secondAttribute="bottom" constant="182" id="peF-CP-geu"/>
                 <constraint firstAttribute="trailing" secondItem="wzd-yS-yYU" secondAttribute="trailing" constant="130" id="rA0-Ey-8nF"/>
                 <constraint firstItem="wzd-yS-yYU" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="130" id="soS-OB-7Fu"/>
-                <constraint firstItem="pio-gw-44I" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="100" id="tXb-YM-CqH"/>
-                <constraint firstAttribute="bottom" secondItem="pio-gw-44I" secondAttribute="bottom" constant="184" id="z1S-eC-NuX"/>
             </constraints>
             <variation key="default">
                 <mask key="subviews">
@@ -62,10 +62,10 @@
                     <exclude reference="LzL-Xi-AVs"/>
                     <exclude reference="rA0-Ey-8nF"/>
                     <exclude reference="soS-OB-7Fu"/>
-                    <exclude reference="EN7-TN-2SG"/>
-                    <exclude reference="hYf-yY-KnX"/>
-                    <exclude reference="tXb-YM-CqH"/>
-                    <exclude reference="z1S-eC-NuX"/>
+                    <exclude reference="DFi-5y-tof"/>
+                    <exclude reference="UHD-Uq-ntu"/>
+                    <exclude reference="khe-Se-GDb"/>
+                    <exclude reference="peF-CP-geu"/>
                 </mask>
             </variation>
             <variation key="widthClass=compact">
@@ -77,10 +77,10 @@
                     <include reference="LzL-Xi-AVs"/>
                     <include reference="rA0-Ey-8nF"/>
                     <include reference="soS-OB-7Fu"/>
-                    <include reference="EN7-TN-2SG"/>
-                    <include reference="hYf-yY-KnX"/>
-                    <include reference="tXb-YM-CqH"/>
-                    <include reference="z1S-eC-NuX"/>
+                    <include reference="DFi-5y-tof"/>
+                    <include reference="UHD-Uq-ntu"/>
+                    <include reference="khe-Se-GDb"/>
+                    <include reference="peF-CP-geu"/>
                 </mask>
             </variation>
         </view>

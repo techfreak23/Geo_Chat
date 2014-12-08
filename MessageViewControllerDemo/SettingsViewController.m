@@ -6,9 +6,12 @@
 //  Copyright (c) 2014 Art Sevilla. All rights reserved.
 //
 
+#import <FacebookSDK/FacebookSDK.h>
 #import "SettingsViewController.h"
 #import "LoginViewController.h"
 #import "ProfileViewController.h"
+#import "UserViewController.h"
+#import "GeoChatManager.h"
 
 @interface SettingsViewController () <UIActionSheetDelegate>
 
@@ -73,7 +76,9 @@
     switch (indexPath.row) {
         case 0: {
             NSLog(@"Getting user info...");
-            
+            UserViewController *controller = [[UserViewController alloc] init];
+            controller.currentUser = [[GeoChatManager sharedManager] currentUser];
+            [self.navigationController pushViewController:controller animated:YES];
         }
             break;
             
@@ -101,6 +106,7 @@
     
     switch (buttonIndex) {
         case 0: {
+            [[FBSession activeSession] closeAndClearTokenInformation];
             LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
             UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
             navController.navigationBarHidden = YES;

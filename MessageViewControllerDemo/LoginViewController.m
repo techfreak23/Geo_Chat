@@ -10,6 +10,7 @@
 #import "LoginViewController.h"
 #import "MasterViewController.h"
 #import "UYLPasswordManager.h"
+#import "GeoChatManager.h"
 
 #define kFacebookTokenIdentifier @"facebookToken"
 
@@ -68,6 +69,7 @@
     } else {
         [manager registerKey:[[[FBSession activeSession] accessTokenData] accessToken] forIdentifier:kFacebookTokenIdentifier];
     }
+    [[GeoChatManager sharedManager] loginWithFacebookID:[[[FBSession activeSession] accessTokenData] accessToken]];
 }
 
 - (void)loginViewShowingLoggedInUser:(FBLoginView *)loginView
@@ -77,12 +79,14 @@
     
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
     
-    [self presentViewController:navController animated:YES completion:nil];
+    [self presentViewController:navController animated:NO completion:nil];
 }
 
 - (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    UYLPasswordManager *manager = [UYLPasswordManager sharedInstance];
+    [manager deleteKeyForIdentifier:kFacebookTokenIdentifier];
 }
 
 @end

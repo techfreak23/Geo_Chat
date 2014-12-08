@@ -28,8 +28,10 @@ BOOL loggedIn = NO;
     [MasterViewController class];
     [LoginViewController class];
     
-    /*
+    UIViewController *controller;
+    
     if ([FBSession activeSession].isOpen) {
+        NSLog(@"The session is still open...");
         // try to open session with existing valid token
         NSArray *permissions = [[NSArray alloc] initWithObjects:
                                 @"user_likes",
@@ -40,15 +42,18 @@ BOOL loggedIn = NO;
         [FBSession setActiveSession:session];
         
         if ([FBSession openActiveSessionWithAllowLoginUI:NO]) {
+            NSLog(@"We're good here... app delegate");
             controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
         } else {
+            NSLog(@"Please show this joker the login view");
             controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
         }
     } else {
+        NSLog(@"Possibly a first time user.... because the session isnt open?");
         controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
     }
-     */
     
+    /*
     if (loggedIn) {
         MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
         self.navController = [[UINavigationController alloc] initWithRootViewController:controller];
@@ -57,6 +62,9 @@ BOOL loggedIn = NO;
         self.navController = [[UINavigationController alloc] initWithRootViewController:controller];
         self.navController.navigationBarHidden = YES;
     }
+     */
+    
+    self.navController = [[UINavigationController alloc] initWithRootViewController:controller];
     
     self.window.rootViewController = self.navController;
     

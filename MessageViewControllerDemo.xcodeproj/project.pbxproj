@@ -67,6 +67,7 @@
 		042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410F1A2C0E00004B0786 /* LoginViewController.xib */; };
 		048074BB1A351983006DAD33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048074BA1A351983006DAD33 /* Security.framework */; };
 		048074FA1A35286F006DAD33 /* UYLPasswordManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074F91A35286F006DAD33 /* UYLPasswordManager.m */; };
+		048074FD1A353DC1006DAD33 /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074FC1A353DC1006DAD33 /* UserViewController.m */; };
 		048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */; };
 		048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */; };
 		048CF7441A2D610C004E20BE /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7421A2D610C004E20BE /* SettingsViewController.m */; };
@@ -213,6 +214,8 @@
 		048074BA1A351983006DAD33 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		048074F81A35286F006DAD33 /* UYLPasswordManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UYLPasswordManager.h; sourceTree = "<group>"; };
 		048074F91A35286F006DAD33 /* UYLPasswordManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UYLPasswordManager.m; sourceTree = "<group>"; };
+		048074FB1A353DC1006DAD33 /* UserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
+		048074FC1A353DC1006DAD33 /* UserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
 		048CF73C1A2D60AB004E20BE /* AddRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddRoomViewController.h; sourceTree = "<group>"; };
 		048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddRoomViewController.m; sourceTree = "<group>"; };
 		048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddRoomViewController.xib; sourceTree = "<group>"; };
@@ -475,6 +478,8 @@
 				048CF7411A2D610C004E20BE /* SettingsViewController.h */,
 				048CF7421A2D610C004E20BE /* SettingsViewController.m */,
 				048CF7431A2D610C004E20BE /* SettingsViewController.xib */,
+				048074FB1A353DC1006DAD33 /* UserViewController.h */,
+				048074FC1A353DC1006DAD33 /* UserViewController.m */,
 				0421F2CD1A314D4300FCAB04 /* ProfileViewController.h */,
 				0421F2CE1A314D4300FCAB04 /* ProfileViewController.m */,
 				042440E91A2BE089004B0786 /* Images.xcassets */,
@@ -700,6 +705,7 @@
 				0421F2B41A3052D200FCAB04 /* JSQMessagesInputToolbar.m in Sources */,
 				0421F2A31A3052D200FCAB04 /* JSQMessagesCollectionViewFlowLayoutInvalidationContext.m in Sources */,
 				042440DF1A2BE089004B0786 /* main.m in Sources */,
+				048074FD1A353DC1006DAD33 /* UserViewController.m in Sources */,
 				0421F2A11A3052D200FCAB04 /* JSQMessagesToolbarButtonFactory.m in Sources */,
 				0421F2AD1A3052D200FCAB04 /* JSQMessagesCollectionView.m in Sources */,
 			);

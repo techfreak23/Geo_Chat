@@ -10,6 +10,10 @@
 #define kChatRoomsEndpoint @"https://geochat-v1.herokuapp.com/api/v1/chat_rooms"
 #define kChatRoomEndpoint @"https://geochat-v1.herokuapp.com/api/v1/chat_room"
 #define kUserEndpoint @"https://geochat-v1.herokuapp.com/api/v1/user"
+#define kFacebookTokenIdentifier @"facebookToken"
+#define kAccessTokenIdentifier @"accessToken"
+#define kRefreshTokenIdentifier @"refreshToken"
+
 #define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 
 #import "GeoChatManager.h"
@@ -22,13 +26,14 @@
 @property (nonatomic, strong) NSMutableArray *roomList;
 @property (nonatomic, strong) NSString *accessToken;
 @property (nonatomic, strong) NSString *refreshToken;
+@property (nonatomic, strong) UYLPasswordManager *manager;
 
 @end
 
 static const NSString *ClientID = @"8c2ec2e8ab5a5a243a8446fac11a0fe744cc46019d6ac7122c72b27624dc6eaf";
 static const NSString *ClientSecret = @"077bb6953ecc71a1ebe62701dbcde913ff0716fb20c81f5fdde7fb4c251efbbb";
-NSString *AccessToken = @"5dd4b181793fbb65add3db6ac3fb74dc7abfaddd6aaefba080437b6a15f96097";
-NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed05078aa159e";
+NSString *AccessToken = @"12ef8ea135269dea14f17741ad66cbe3002ee2b86ce6cf64b9aac3a65eeacff9";
+NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f9bf0ff57f8e";
 
 @implementation GeoChatManager
 
@@ -54,7 +59,15 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
     if (self) {
         NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
         _urlSession = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
-        [self fetchCurrentUser];
+        _manager = [UYLPasswordManager sharedInstance];
+        if ([_manager keyForIdentifier:kAccessTokenIdentifier]) {
+            _accessToken = [_manager keyForIdentifier:kAccessTokenIdentifier];
+        }
+        
+        if ([_manager keyForIdentifier:kRefreshTokenIdentifier]) {
+            _refreshToken = [_manager keyForIdentifier:kRefreshTokenIdentifier];
+        }
+        //[self fetchCurrentUser];
     }
     
     return self;
@@ -70,7 +83,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
             NSHTTPURLResponse *newResponse = (NSHTTPURLResponse *)response;
             NSLog(@"Response code: %ld", (long)newResponse.statusCode);
             if (newResponse.statusCode == 200) {
-                handler([self parseResponseData:data], nil);
+                handler([self parseResponseData:data], response, nil);
             } else if (newResponse.statusCode == 401) {
                 NSLog(@"Token expired...");
                 //[self refreshAccessToken];
@@ -78,7 +91,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
             
         } else {
             NSLog(@"There was an error with the data task: %@", error.description);
-            handler(nil, error);
+            handler(nil, response, error);
         }
     }];
     [dataTask resume];
@@ -107,17 +120,17 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
                 NSLog(@"About to parse data...");
                 NSLog(@"Response: %@", response);
                 
-                handler([self parseResponseData:data], nil);
+                handler([self parseResponseData:data], response, nil);
                 
             } else {
                 NSLog(@"Something went wrong with the data task: %@", error.description);
-                handler(nil, error);
+                handler(nil, response, error);
             }
         }];
         [dataTask resume];
     } else {
         NSLog(@"There was an erroring converting the post params: %@", parseError.description);
-        handler(nil, parseError);
+        handler(nil, nil, parseError);
     }
 }
 
@@ -144,10 +157,24 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 - (void)loginWithFacebookID:(NSString *)fbToken
 {
     NSDictionary *paramDict = @{@"client_id": ClientID, @"client_secrect": ClientSecret, @"grant_type": @"assertion", @"assertion": fbToken};
-    [self sendPostRequestForEndpoint:kOAuthEndpoint withParameters:paramDict completion:^(id responseItem, NSError *error) {
+    [self sendPostRequestForEndpoint:kOAuthEndpoint withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         if (!error) {
-            _authTokens = (NSDictionary *)responseItem;
-            NSLog(@"auth tokens: %@", _authTokens);
+            NSHTTPURLResponse *responseH = (NSHTTPURLResponse *)response;
+            
+            if (responseH.statusCode == 200) {
+                _authTokens = (NSDictionary *)responseItem;
+                NSLog(@"auth tokens: %@", _authTokens);
+                NSLog(@"fb token: %@", fbToken);
+                if ([_manager keyForIdentifier:@"accessToken"]) {
+                    [_manager deleteKeyForIdentifier:@"accessToken"];
+                }
+                NSString *token = [_manager keyForIdentifier:@"facebookToken"];
+                NSLog(@"Token: %@", token);
+            } else if (responseH.statusCode == 401) {
+                NSLog(@"Not authorized...");
+                [self refreshAccessToken];
+            }
+            
         }
     }];
 }
@@ -155,7 +182,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 //fetches user info. return dictionary and stores it as GeoChatUser object
 - (void)fetchCurrentUser
 {
-    [self sendGetRequestForEndpoint:[self stringForCurrentUser] completion:^(id responseItem, NSError *error) {
+    [self sendGetRequestForEndpoint:[self stringForCurrentUser] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         NSLog(@"User item: %@", responseItem);
         GeoChatUser *newUser = [[GeoChatUser alloc] init];
         [newUser configureUserForDictionary:(NSMutableDictionary *)responseItem];
@@ -173,7 +200,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 //passes get room list url string to get request method
 - (void)fetchRoomsWithLatitude:(NSString *)latitude longitude:(NSString *)longitude offset:(NSString *)offset size:(NSString *)size radius:(NSString *)radius
 {
-        [self sendGetRequestForEndpoint:[self fetchRoomStringWithLatitude:latitude longitude:longitude offset:offset size:size radius:radius] completion:^(id responseItem, NSError *error) {
+        [self sendGetRequestForEndpoint:[self fetchRoomStringWithLatitude:latitude longitude:longitude offset:offset size:size radius:radius] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
             _roomList = [NSMutableArray arrayWithArray:(NSArray *)responseItem];
             
             if (!error) {
@@ -188,6 +215,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 //creates url string to pass to get request
 - (NSString *)fetchRoomStringWithLatitude:(NSString *)latitude longitude:(NSString *)longitude offset:(NSString *)offset size:(NSString *)size radius:(NSString *)radius
 {
+    NSLog(@"Room url: %@", [NSString stringWithFormat:@"%@?access_token=%@&latitude=%@&longitude=%@&offset=%@&size=%@&radius=%@", kChatRoomsEndpoint, [_authTokens objectForKey:@"access_token"], latitude, longitude, offset, size, radius]);
     return [NSString stringWithFormat:@"%@?access_token=%@&latitude=%@&longitude=%@&offset=%@&size=%@&radius=%@", kChatRoomsEndpoint, AccessToken, latitude, longitude, offset, size, radius];
 }
 
@@ -196,7 +224,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 {
     NSString *urlString = [NSString stringWithFormat:@"%@/create", kChatRoomsEndpoint];
     NSDictionary *paramDict = @{@"access_token": AccessToken, @"name": name, @"latitude": latitude, @"longitude": longitude};
-    [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSError *error) {
+    [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         if (!error) {
             [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithObject" object:responseItem];
         }
@@ -205,7 +233,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 
 - (void)fetchRoomForID:(NSString *)roomID
 {
-    [self sendGetRequestForEndpoint:[self stringForRoomID:roomID] completion:^(id responseItem, NSError *error) {
+    [self sendGetRequestForEndpoint:[self stringForRoomID:roomID] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithRoomObject" object:responseItem];
     }];
 }
@@ -220,7 +248,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 {
     NSString *urlString = [NSString stringWithFormat:@"%@/send_message", kChatRoomEndpoint];
     NSDictionary *paramDict = @{@"access_token": AccessToken, @"id": roomID, @"content": message};
-    [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSError *error) {
+    [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         
     }];
 }
@@ -228,7 +256,7 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 //gathers a list of all active chat rooms for the user
 - (void)listChatroomsForUser
 {
-    [self sendGetRequestForEndpoint:[self fetchRoomListForUserString] completion:^(id responseItem, NSError *error) {
+    [self sendGetRequestForEndpoint:[self fetchRoomListForUserString] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         
     }];
 }
@@ -243,11 +271,23 @@ NSString *RefreshToken = @"e820bca534c3eaf88ed1078ba2959a306dbc6631ea51fbee708ed
 - (void)refreshAccessToken
 {
     NSDictionary *paramDict = @{@"access_token": AccessToken, @"grant_type": @"refresh_token", @"refresh_token": RefreshToken};
-    [self sendPostRequestForEndpoint:kOAuthEndpoint withParameters:paramDict completion:^(id responseItem, NSError *error) {
+    [self sendPostRequestForEndpoint:kOAuthEndpoint withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         if (!error) {
             NSLog(@"Refresh and access tokens: %@", responseItem);
             AccessToken = [responseItem objectForKey:@"access_token"];
             RefreshToken = [responseItem objectForKey:@"refresh_token"];
+            if ([_manager keyForIdentifier:kAccessTokenIdentifier]) {
+                [_manager deleteKeyForIdentifier:kAccessTokenIdentifier];
+                [_manager registerKey:[responseItem objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
+            } else {
+                [_manager registerKey:[responseItem objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
+            }
+            if ([_manager keyForIdentifier:kRefreshTokenIdentifier]) {
+                [_manager deleteKeyForIdentifier:kRefreshTokenIdentifier];
+                [_manager registerKey:[responseItem objectForKey:@"refresh_token"] forIdentifier:kRefreshTokenIdentifier];
+            } else {
+                [_manager registerKey:[responseItem objectForKey:@"refresh_token"] forIdentifier:kRefreshTokenIdentifier];
+            }
         }
     }];
 }

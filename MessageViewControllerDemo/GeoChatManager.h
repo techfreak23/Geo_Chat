@@ -20,7 +20,7 @@
 
 @end
 
-typedef void (^RequestCompletion)(id responseItem, NSError *error);
+typedef void (^RequestCompletion)(id responseItem, NSURLResponse *response, NSError *error);
 
 
 @interface GeoChatManager : NSObject
@@ -30,6 +30,7 @@ typedef void (^RequestCompletion)(id responseItem, NSError *error);
 
 + (GeoChatManager *)sharedManager;
 
+- (void)loginWithFacebookID:(NSString *)fbToken;
 - (void)fetchRoomsWithLatitude:(NSString *)latitude longitude:(NSString *)longitude offset:(NSString *)offset size:(NSString *)size radius:(NSString *)radius;
 - (void)createRoomWithName:(NSString *)name latitude:(NSString *)latitude longitude:(NSString *)longitude;
 - (void)fetchRoomForID:(NSString *)roomID;

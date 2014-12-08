@@ -117,7 +117,7 @@
             
         case 1: {
             NSLog(@"Setting location label...");
-            _locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cell.contentView.frame.size.width/2, cell.contentView.frame.size.height)];
+            _locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cell.contentView.frame.size.width/1.75, cell.contentView.frame.size.height)];
             _locationLabel.text = @"Getting location...";
             _locationLabel.textAlignment = NSTextAlignmentCenter;
             

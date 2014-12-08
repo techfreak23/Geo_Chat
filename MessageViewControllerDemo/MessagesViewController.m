@@ -200,7 +200,7 @@
     NSString *roomID = [_roomInfo objectForKey:@"id"];
     [[GeoChatManager sharedManager] sendMessageWithText:text forChatRoomID:roomID];
     
-    //JSQMessage *newMessage = [JSQMessage messageWithSenderId:senderId displayName:senderDisplayName text:text];
+    //JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:senderId senderDisplayName:senderDisplayName date:date text:text];
     
     //[_jsqMessages addObject:newMessage];
     
