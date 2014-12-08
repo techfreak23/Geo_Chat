@@ -1,5 +1,5 @@
 //
-//  ViewController.h
+//  MasterViewController.h
 //  MessageViewControllerDemo
 //
 //  Created by Art Sevilla on 11/30/14.
@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController
-
+@interface MasterViewController : UITableViewController
 
 @end
-
