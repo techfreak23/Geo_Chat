@@ -32,6 +32,8 @@
     
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
+    
     self.title = @"Add room";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(cancelAdd)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(createNewRoom)];
@@ -44,6 +46,13 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)cancelAdd
@@ -59,10 +68,15 @@
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
     
     [[GeoChatManager sharedManager] createRoomWithName:_roomNameField.text latitude:latitude longitude:longitude];
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-        
+}
+
+- (void)didFinishCreatingRoom:(NSNotification *)notification
+{
+    NSLog(@"Did finish creating room: %@", [notification object]);
+    [self.presentingViewController dismissViewControllerAnimated:YES completion: ^{
+        NSLog(@"Dismissed add room view with completion...");
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishAddingRoom" object:[notification object]];
     }];
-    
 }
 
 - (void)updateLocation
@@ -103,12 +117,17 @@
     }
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    
+    CGRect cellFrame = cell.frame;
+    
     
     switch (indexPath.row) {
         case 0: {
             NSLog(@"Setting name text field...");
-            CGRect frame = cell.contentView.frame;
-            _roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(frame.origin.x + 20, frame.origin.y + 10, frame.size.width - 40, frame.size.height - 20)];
+            _roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width/2, cellFrame.size.height)];
+            _roomNameField.translatesAutoresizingMaskIntoConstraints = NO;
             _roomNameField.placeholder = @"Room name";
             _roomNameField.delegate = self;
             [cell.contentView addSubview:_roomNameField];
@@ -117,11 +136,13 @@
             
         case 1: {
             NSLog(@"Setting location label...");
-            _locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cell.contentView.frame.size.width/1.75, cell.contentView.frame.size.height)];
+            _locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width/2, cellFrame.size.height)];
+            _locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
             _locationLabel.text = @"Getting location...";
             _locationLabel.textAlignment = NSTextAlignmentCenter;
             
-            _updateButton = [[UIButton alloc] initWithFrame:CGRectMake(_locationLabel.frame.size.width, cell.contentView.frame.origin.y, cell.contentView.frame.size.width/2, cell.contentView.frame.size.height)];
+            _updateButton = [[UIButton alloc] initWithFrame:CGRectMake(_locationLabel.frame.size.width, _locationLabel.frame.origin.y, cellFrame.size.width/2, cellFrame.size.height)];
+            _updateButton.translatesAutoresizingMaskIntoConstraints = NO;
             [_updateButton addTarget:self action:@selector(updateLocation) forControlEvents:UIControlEventTouchUpInside];
             _updateButton.titleLabel.textColor = [UIColor blackColor];
             [_updateButton setTitle:@"Update location" forState:UIControlStateNormal];

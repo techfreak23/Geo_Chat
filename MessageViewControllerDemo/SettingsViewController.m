@@ -11,6 +11,7 @@
 #import "LoginViewController.h"
 #import "ProfileViewController.h"
 #import "UserViewController.h"
+#import "ChangeNicknameViewController.h"
 #import "GeoChatManager.h"
 
 @interface SettingsViewController () <UIActionSheetDelegate>
@@ -84,6 +85,8 @@
             
         case 1: {
             NSLog(@"Presenting change nickname view...");
+            ChangeNicknameViewController *controller = [[ChangeNicknameViewController alloc] init];
+            [self.navigationController pushViewController:controller animated:YES];
         }
             break;
             

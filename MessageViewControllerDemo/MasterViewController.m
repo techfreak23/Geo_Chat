@@ -5,11 +5,11 @@
 //  Created by Art Sevilla on 11/30/14.
 //  Copyright (c) 2014 Art Sevilla. All rights reserved.
 //
-
-#import "JSQMessagesViewController.h"
-#import "JSQMessages.h"
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
+#import <QuartzCore/QuartzCore.h>
+#import "JSQMessagesViewController.h"
+#import "JSQMessages.h"
 #import "MasterViewController.h"
 #import "AddRoomViewController.h"
 #import "SettingsViewController.h"
@@ -40,9 +40,13 @@ static NSString *reuseIdentifier = @"Cell";
     NSLog(@"Master view loading...");
     
     self.title = @"GeoChat!";
-    //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
+    
+    _indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(100, 320, 200.0, 200.0)];
+    _indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+    [self.view addSubview:_indicatorView];
+    [_indicatorView startAnimating];
     
     [GeoChatManager sharedManager].delegate = self;
     
@@ -71,11 +75,13 @@ static NSString *reuseIdentifier = @"Cell";
                 NSLog(@"Most recent location: %@", [_locationManager location]);
                 
                 self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-                [self performSelectorInBackground:@selector(fetchRooms) withObject:_roomItems];
+                //[self performSelectorInBackground:@selector(fetchRooms) withObject:nil];
+                [self fetchRooms];
             } else {
                 NSLog(@"Starting location services...");
                 [_locationManager startUpdatingLocation];
-                [self performSelectorInBackground:@selector(fetchRooms) withObject:_roomItems];
+                //[self performSelectorInBackground:@selector(fetchRooms) withObject:nil];
+                [self fetchRooms];
             }
         } else if (status == kCLAuthorizationStatusRestricted) {
             NSLog(@"Status restricted...");
@@ -141,21 +147,34 @@ static NSString *reuseIdentifier = @"Cell";
     
     NSIndexPath *selectedPath = [self.tableView indexPathForSelectedRow];
     [self.tableView deselectRowAtIndexPath:selectedPath animated:YES];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingRoom" object:nil];
     //[self updateRoomsAfterCreation];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithObject" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableData:) name:@"didFinishAddingRoom" object:nil];
 }
 
 - (void)didFinishRequestWithItem:(NSNotification *)notification
 {
-    NSLog(@"Did send finish request: %@", notification);
+    //NSLog(@"Did send finish request: %@", notification);
     _roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    [self.tableView reloadData];
+    [_indicatorView stopAnimating];
+   [self.tableView reloadData];
+}
+
+- (void)reloadTableData:(NSNotification *)notification
+{
+    NSLog(@"Should be reloading from notification: %@", [notification object]);
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+    [_roomItems addObject:[notification object]];
+    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    
+    [self fetchRooms];
 }
 
 - (void)didFinishRequestWithSuccessItem:(NSMutableArray *)roomList
@@ -209,11 +228,15 @@ static NSString *reuseIdentifier = @"Cell";
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:reuseIdentifier];
     }
     
+    
+    
     cell.textLabel.text = [[_roomItems objectAtIndex:indexPath.row] objectForKey:@"name"];
-    cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %@", [[_roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"]];
+    cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %.2f", [[[_roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"] floatValue]];
     
     return cell;
 }
+
+#pragma mark - table view delegate methods
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -223,6 +246,15 @@ static NSString *reuseIdentifier = @"Cell";
     controller.roomInfo = [_roomItems objectAtIndex:indexPath.row];
     
     [self.navigationController pushViewController:controller animated:YES];
+}
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    cell.layer.opacity = 0.5;
+    
+    [UIView animateWithDuration:0.3 animations:^ {
+        cell.layer.opacity = 1.0;
+    }];
 }
 
 #pragma  mark - location manager delegate methods

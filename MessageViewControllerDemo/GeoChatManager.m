@@ -14,7 +14,7 @@
 #define kAccessTokenIdentifier @"accessToken"
 #define kRefreshTokenIdentifier @"refreshToken"
 
-#define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
+#define kBgQueue dispatch_queue_create("com.MosRedRocket.geochatmanager.bgqueue", NULL)
 
 #import "GeoChatManager.h"
 #import "UYLPasswordManager.h"
@@ -30,10 +30,10 @@
 
 @end
 
-static const NSString *ClientID = @"8c2ec2e8ab5a5a243a8446fac11a0fe744cc46019d6ac7122c72b27624dc6eaf";
-static const NSString *ClientSecret = @"077bb6953ecc71a1ebe62701dbcde913ff0716fb20c81f5fdde7fb4c251efbbb";
-NSString *AccessToken = @"12ef8ea135269dea14f17741ad66cbe3002ee2b86ce6cf64b9aac3a65eeacff9";
-NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f9bf0ff57f8e";
+static const NSString *ClientID = @"107d5e7228ae2c1c911a4ff910ceda2a05fca50ff951c271f6d3a7851f9bbdf5";
+static const NSString *ClientSecret = @"06dcef77d5ff607b7efae20f406b2667f8341e375819182870192a43c6461d16";
+NSString *AccessToken = @"c69b40bbaf08f7136d57adf0fe4d82e706987689898fa05326c142d23630e3c7";
+NSString *RefreshToken = @"e57363dab8690301c0ad8e9b359b0073c6a62e603cd09c2181f0821ab2d428ac";
 
 @implementation GeoChatManager
 
@@ -62,10 +62,12 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
         _manager = [UYLPasswordManager sharedInstance];
         if ([_manager keyForIdentifier:kAccessTokenIdentifier]) {
             _accessToken = [_manager keyForIdentifier:kAccessTokenIdentifier];
+            AccessToken = [_manager keyForIdentifier:kAccessTokenIdentifier];
         }
         
         if ([_manager keyForIdentifier:kRefreshTokenIdentifier]) {
             _refreshToken = [_manager keyForIdentifier:kRefreshTokenIdentifier];
+            RefreshToken = [_manager keyForIdentifier:kRefreshTokenIdentifier];
         }
         //[self fetchCurrentUser];
     }
@@ -78,24 +80,20 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
 {
     NSURL *getURL = [NSURL URLWithString:urlString];
     
-    NSURLSessionDataTask *dataTask = [_urlSession dataTaskWithURL:getURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (!error) {
-            NSHTTPURLResponse *newResponse = (NSHTTPURLResponse *)response;
-            NSLog(@"Response code: %ld", (long)newResponse.statusCode);
-            if (newResponse.statusCode == 200) {
+    dispatch_async(kBgQueue, ^ {
+        NSURLSessionDataTask *dataTask = [_urlSession dataTaskWithURL:getURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            if (!error) {
+                NSHTTPURLResponse *newResponse = (NSHTTPURLResponse *)response;
+                NSLog(@"Response code: %ld", (long)newResponse.statusCode);
                 handler([self parseResponseData:data], response, nil);
-            } else if (newResponse.statusCode == 401) {
-                NSLog(@"Token expired...");
-                //[self refreshAccessToken];
+                
+            } else {
+                NSLog(@"There was an error with the data task: %@", error.description);
+                handler(nil, response, error);
             }
-            
-        } else {
-            NSLog(@"There was an error with the data task: %@", error.description);
-            handler(nil, response, error);
-        }
-    }];
-    [dataTask resume];
-    
+        }];
+        [dataTask resume];
+    });
 }
 
 //sending the POST request
@@ -115,19 +113,23 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
         [request setHTTPMethod:@"POST"];
         [request setHTTPBody:data];
         
-        NSURLSessionDataTask *dataTask = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            if (!error) {
-                NSLog(@"About to parse data...");
-                NSLog(@"Response: %@", response);
-                
-                handler([self parseResponseData:data], response, nil);
-                
-            } else {
-                NSLog(@"Something went wrong with the data task: %@", error.description);
-                handler(nil, response, error);
-            }
-        }];
-        [dataTask resume];
+        NSLog(@"My post request: %@\nBody: %@", request, request.HTTPBody.description);
+        
+        dispatch_async(kBgQueue, ^ {
+            NSURLSessionDataTask *dataTask = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                if (!error) {
+                    NSLog(@"About to parse data...");
+                    //NSLog(@"Response: %@", response);
+                    
+                    handler([self parseResponseData:data], response, nil);
+                    
+                } else {
+                    NSLog(@"Something went wrong with the data task: %@", error.description);
+                    handler(nil, response, error);
+                }
+            }];
+            [dataTask resume];
+        });
     } else {
         NSLog(@"There was an erroring converting the post params: %@", parseError.description);
         handler(nil, nil, parseError);
@@ -167,9 +169,14 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
                 NSLog(@"fb token: %@", fbToken);
                 if ([_manager keyForIdentifier:@"accessToken"]) {
                     [_manager deleteKeyForIdentifier:@"accessToken"];
+                    [_manager registerKey:[_authTokens objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
+                    [self fetchCurrentUser];
+                } else {
+                    [_manager registerKey:[_authTokens objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
+                    [self fetchCurrentUser];
                 }
-                NSString *token = [_manager keyForIdentifier:@"facebookToken"];
-                NSLog(@"Token: %@", token);
+                //NSString *token = [_manager keyForIdentifier:@"facebookToken"];
+                //NSLog(@"Token: %@", token);
             } else if (responseH.statusCode == 401) {
                 NSLog(@"Not authorized...");
                 [self refreshAccessToken];
@@ -182,6 +189,7 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
 //fetches user info. return dictionary and stores it as GeoChatUser object
 - (void)fetchCurrentUser
 {
+    NSLog(@"%s", __PRETTY_FUNCTION__);
     [self sendGetRequestForEndpoint:[self stringForCurrentUser] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         NSLog(@"User item: %@", responseItem);
         GeoChatUser *newUser = [[GeoChatUser alloc] init];
@@ -204,7 +212,17 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
             _roomList = [NSMutableArray arrayWithArray:(NSArray *)responseItem];
             
             if (!error) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithObject" object:responseItem];
+                NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+                
+                if (httpResponse.statusCode == 200) {
+                    NSLog(@"Good response");
+                    
+                    dispatch_async(dispatch_get_main_queue(), ^ {
+                        [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithObject" object:responseItem];
+                    });
+                } else if (httpResponse.statusCode == 401) {
+                    NSLog(@"Auth token is expired...");
+                }
             } else {
                 NSLog(@"There was an error: %@", error.description);
             }
@@ -226,7 +244,10 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
     NSDictionary *paramDict = @{@"access_token": AccessToken, @"name": name, @"latitude": latitude, @"longitude": longitude};
     [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         if (!error) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithObject" object:responseItem];
+            NSLog(@"Should be posting notification...");
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishCreatingRoom" object:responseItem];
+            });
         }
     }];
 }
@@ -234,7 +255,9 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
 - (void)fetchRoomForID:(NSString *)roomID
 {
     [self sendGetRequestForEndpoint:[self stringForRoomID:roomID] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithRoomObject" object:responseItem];
+        dispatch_async(dispatch_get_main_queue(), ^ {
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithRoomObject" object:responseItem];
+        });
     }];
 }
 
@@ -247,9 +270,22 @@ NSString *RefreshToken = @"6564cbc497a001d8354ea61df66958f544cc277953338ddd79d5f
 - (void)sendMessageWithText:(NSString *)message forChatRoomID:(NSString *)roomID
 {
     NSString *urlString = [NSString stringWithFormat:@"%@/send_message", kChatRoomEndpoint];
-    NSDictionary *paramDict = @{@"access_token": AccessToken, @"id": roomID, @"content": message};
+    NSDictionary *paramDict = @{@"access_token": AccessToken, @"id": roomID, @"message": @{@"content": message}};
     [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
-        
+        if (!error) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            
+            if (httpResponse.statusCode == 201) {
+                dispatch_async(dispatch_get_main_queue(), ^ {
+                    NSLog(@"should be sending message here...");
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingMessage" object:responseItem];
+                });
+            } else if (httpResponse.statusCode == 500) {
+                NSLog(@"Internal server error...");
+            } else if (httpResponse.statusCode == 401) {
+                NSLog(@"Auth token has expired...");
+            }
+        }
     }];
 }
 

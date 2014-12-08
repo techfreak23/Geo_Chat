@@ -65,9 +65,12 @@
 		0424410C1A2C0DBB004B0786 /* MasterViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410A1A2C0DBB004B0786 /* MasterViewController.xib */; };
 		042441101A2C0E00004B0786 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424410E1A2C0E00004B0786 /* LoginViewController.m */; };
 		042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410F1A2C0E00004B0786 /* LoginViewController.xib */; };
+		044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */; };
 		048074BB1A351983006DAD33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048074BA1A351983006DAD33 /* Security.framework */; };
 		048074FA1A35286F006DAD33 /* UYLPasswordManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074F91A35286F006DAD33 /* UYLPasswordManager.m */; };
 		048074FD1A353DC1006DAD33 /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074FC1A353DC1006DAD33 /* UserViewController.m */; };
+		048075011A3580D2006DAD33 /* ConstrainedTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074FF1A3580D2006DAD33 /* ConstrainedTableViewCell.m */; };
+		048075021A3580D2006DAD33 /* ConstrainedTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048075001A3580D2006DAD33 /* ConstrainedTableViewCell.xib */; };
 		048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */; };
 		048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */; };
 		048CF7441A2D610C004E20BE /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7421A2D610C004E20BE /* SettingsViewController.m */; };
@@ -211,11 +214,16 @@
 		0424410D1A2C0E00004B0786 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
 		0424410E1A2C0E00004B0786 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
 		0424410F1A2C0E00004B0786 /* LoginViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LoginViewController.xib; sourceTree = "<group>"; };
+		044A7FC81A359A2100EADA8A /* ChangeNicknameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeNicknameViewController.h; sourceTree = "<group>"; };
+		044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeNicknameViewController.m; sourceTree = "<group>"; };
 		048074BA1A351983006DAD33 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		048074F81A35286F006DAD33 /* UYLPasswordManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UYLPasswordManager.h; sourceTree = "<group>"; };
 		048074F91A35286F006DAD33 /* UYLPasswordManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UYLPasswordManager.m; sourceTree = "<group>"; };
 		048074FB1A353DC1006DAD33 /* UserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
 		048074FC1A353DC1006DAD33 /* UserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
+		048074FE1A3580D2006DAD33 /* ConstrainedTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConstrainedTableViewCell.h; sourceTree = "<group>"; };
+		048074FF1A3580D2006DAD33 /* ConstrainedTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConstrainedTableViewCell.m; sourceTree = "<group>"; };
+		048075001A3580D2006DAD33 /* ConstrainedTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConstrainedTableViewCell.xib; sourceTree = "<group>"; };
 		048CF73C1A2D60AB004E20BE /* AddRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddRoomViewController.h; sourceTree = "<group>"; };
 		048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddRoomViewController.m; sourceTree = "<group>"; };
 		048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddRoomViewController.xib; sourceTree = "<group>"; };
@@ -475,11 +483,16 @@
 				048CF73C1A2D60AB004E20BE /* AddRoomViewController.h */,
 				048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */,
 				048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */,
+				048074FE1A3580D2006DAD33 /* ConstrainedTableViewCell.h */,
+				048074FF1A3580D2006DAD33 /* ConstrainedTableViewCell.m */,
+				048075001A3580D2006DAD33 /* ConstrainedTableViewCell.xib */,
 				048CF7411A2D610C004E20BE /* SettingsViewController.h */,
 				048CF7421A2D610C004E20BE /* SettingsViewController.m */,
 				048CF7431A2D610C004E20BE /* SettingsViewController.xib */,
 				048074FB1A353DC1006DAD33 /* UserViewController.h */,
 				048074FC1A353DC1006DAD33 /* UserViewController.m */,
+				044A7FC81A359A2100EADA8A /* ChangeNicknameViewController.h */,
+				044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */,
 				0421F2CD1A314D4300FCAB04 /* ProfileViewController.h */,
 				0421F2CE1A314D4300FCAB04 /* ProfileViewController.m */,
 				042440E91A2BE089004B0786 /* Images.xcassets */,
@@ -635,6 +648,7 @@
 				048CF7451A2D610C004E20BE /* SettingsViewController.xib in Resources */,
 				0421F2B21A3052D200FCAB04 /* JSQMessagesCollectionViewCellOutgoing.xib in Resources */,
 				0421F2BC1A3052D200FCAB04 /* JSQMessagesTypingIndicatorFooterView.xib in Resources */,
+				048075021A3580D2006DAD33 /* ConstrainedTableViewCell.xib in Resources */,
 				042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */,
 				042440ED1A2BE089004B0786 /* LaunchScreen.xib in Resources */,
 				042440EA1A2BE089004B0786 /* Images.xcassets in Resources */,
@@ -674,6 +688,7 @@
 				042440E21A2BE089004B0786 /* AppDelegate.m in Sources */,
 				0421F2B31A3052D200FCAB04 /* JSQMessagesComposerTextView.m in Sources */,
 				0421F2A91A3052D200FCAB04 /* JSQMessagesBubbleImage.m in Sources */,
+				044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */,
 				0421F2BB1A3052D200FCAB04 /* JSQMessagesTypingIndicatorFooterView.m in Sources */,
 				0421F2AE1A3052D200FCAB04 /* JSQMessagesCollectionViewCell.m in Sources */,
 				0421F29A1A3052D200FCAB04 /* JSQMessagesKeyboardController.m in Sources */,
@@ -687,6 +702,7 @@
 				048CF7441A2D610C004E20BE /* SettingsViewController.m in Sources */,
 				0421F29D1A3052D200FCAB04 /* JSQMessagesAvatarImageFactory.m in Sources */,
 				0421F2991A3052D200FCAB04 /* UIView+JSQMessages.m in Sources */,
+				048075011A3580D2006DAD33 /* ConstrainedTableViewCell.m in Sources */,
 				0421F2B11A3052D200FCAB04 /* JSQMessagesCollectionViewCellOutgoing.m in Sources */,
 				0421F2981A3052D200FCAB04 /* UIImage+JSQMessages.m in Sources */,
 				0421F29E1A3052D200FCAB04 /* JSQMessagesBubbleImageFactory.m in Sources */,
