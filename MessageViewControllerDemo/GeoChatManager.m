@@ -32,8 +32,8 @@
 
 static const NSString *ClientID = @"107d5e7228ae2c1c911a4ff910ceda2a05fca50ff951c271f6d3a7851f9bbdf5";
 static const NSString *ClientSecret = @"06dcef77d5ff607b7efae20f406b2667f8341e375819182870192a43c6461d16";
-NSString *AccessToken = @"c69b40bbaf08f7136d57adf0fe4d82e706987689898fa05326c142d23630e3c7";
-NSString *RefreshToken = @"e57363dab8690301c0ad8e9b359b0073c6a62e603cd09c2181f0821ab2d428ac";
+NSString *AccessToken = @"3b8809d19e5655ad666239206189bd98dafeea3aa34d6f78921f260bf21dc19d";
+NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265ebb6deb3fddad";
 
 @implementation GeoChatManager
 
