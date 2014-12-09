@@ -13,6 +13,7 @@
 #define kFacebookTokenIdentifier @"facebookToken"
 #define kAccessTokenIdentifier @"accessToken"
 #define kRefreshTokenIdentifier @"refreshToken"
+#define kExpirationTokenIdentifier @"expireToken"
 
 #define kBgQueue dispatch_queue_create("com.MosRedRocket.geochatmanager.bgqueue", NULL)
 
@@ -32,8 +33,8 @@
 
 static const NSString *ClientID = @"107d5e7228ae2c1c911a4ff910ceda2a05fca50ff951c271f6d3a7851f9bbdf5";
 static const NSString *ClientSecret = @"06dcef77d5ff607b7efae20f406b2667f8341e375819182870192a43c6461d16";
-NSString *AccessToken = @"3b8809d19e5655ad666239206189bd98dafeea3aa34d6f78921f260bf21dc19d";
-NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265ebb6deb3fddad";
+NSString *AccessToken = @"70305874436ceefeb8a21c0753d29644978606e0674ee99bb743385ca08d5084";
+NSString *RefreshToken = @"618f10467ba68efdbc11da6a57d9e8024131365440ff23e0ac601e1847e263d9";
 
 @implementation GeoChatManager
 
@@ -60,16 +61,6 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
         NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
         _urlSession = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
         _manager = [UYLPasswordManager sharedInstance];
-        if ([_manager keyForIdentifier:kAccessTokenIdentifier]) {
-            _accessToken = [_manager keyForIdentifier:kAccessTokenIdentifier];
-            AccessToken = [_manager keyForIdentifier:kAccessTokenIdentifier];
-        }
-        
-        if ([_manager keyForIdentifier:kRefreshTokenIdentifier]) {
-            _refreshToken = [_manager keyForIdentifier:kRefreshTokenIdentifier];
-            RefreshToken = [_manager keyForIdentifier:kRefreshTokenIdentifier];
-        }
-        //[self fetchCurrentUser];
     }
     
     return self;
@@ -113,14 +104,10 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
         [request setHTTPMethod:@"POST"];
         [request setHTTPBody:data];
         
-        NSLog(@"My post request: %@\nBody: %@", request, request.HTTPBody.description);
-        
         dispatch_async(kBgQueue, ^ {
             NSURLSessionDataTask *dataTask = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (!error) {
                     NSLog(@"About to parse data...");
-                    //NSLog(@"Response: %@", response);
-                    
                     handler([self parseResponseData:data], response, nil);
                     
                 } else {
@@ -140,7 +127,6 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
 - (id)parseResponseData:(NSData *)data
 {
     NSLog(@"Parsing data...");
-    
     NSError *error;
     
     id responseItem = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
@@ -167,6 +153,34 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
                 _authTokens = (NSDictionary *)responseItem;
                 NSLog(@"auth tokens: %@", _authTokens);
                 NSLog(@"fb token: %@", fbToken);
+                
+                if ([_manager keyForIdentifier:@"authTokens"]) {
+                    NSLog(@"Auth tokens exist!");
+                    NSDictionary *temp = (NSDictionary *)[_manager keyForIdentifier:@"authTokens"];
+                    AccessToken = [temp objectForKey:@"access_token"];
+                    RefreshToken = [temp objectForKey:@"refresh_token"];
+                    /*
+                    if ([temp objectForKey:@"expires_in"]) {
+                        int current = [[temp objectForKey:@"expires_in"] intValue];
+                        
+                        if (current > 1200) {
+                            NSLog(@"AuthToken still valid...");
+                            _accessToken = [temp objectForKey:@"access_token"];
+                            _refreshToken = [temp objectForKey:@"refesh_token"];
+                        } else {
+                            //[_manager registerKey: forIdentifier:@"authTokens"];
+                        }
+                    }*/
+                
+                }
+                
+                [self fetchCurrentUser];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSLog(@"Should be sending notification...");
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishLoggingIn" object:nil];
+                });
+                
+                /*
                 if ([_manager keyForIdentifier:@"accessToken"]) {
                     [_manager deleteKeyForIdentifier:@"accessToken"];
                     [_manager registerKey:[_authTokens objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
@@ -175,11 +189,10 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
                     [_manager registerKey:[_authTokens objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
                     [self fetchCurrentUser];
                 }
-                //NSString *token = [_manager keyForIdentifier:@"facebookToken"];
-                //NSLog(@"Token: %@", token);
+                 */
             } else if (responseH.statusCode == 401) {
                 NSLog(@"Not authorized...");
-                [self refreshAccessToken];
+                //[self refreshAccessToken];
             }
             
         }
@@ -252,15 +265,17 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
     }];
 }
 
+//fetches room info for id
 - (void)fetchRoomForID:(NSString *)roomID
 {
     [self sendGetRequestForEndpoint:[self stringForRoomID:roomID] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^ {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithRoomObject" object:responseItem];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithRoomInfo" object:responseItem];
         });
     }];
 }
 
+//creates string for room request
 - (NSString *)stringForRoomID:(NSString *)roomID
 {
     return [NSString stringWithFormat:@"%@?id=%@&access_token=%@", kChatRoomEndpoint, roomID, AccessToken];
@@ -312,17 +327,26 @@ NSString *RefreshToken = @"26136cd65d4d8cfce6445f5811d4356d35ad7f9038385353265eb
             NSLog(@"Refresh and access tokens: %@", responseItem);
             AccessToken = [responseItem objectForKey:@"access_token"];
             RefreshToken = [responseItem objectForKey:@"refresh_token"];
+            
             if ([_manager keyForIdentifier:kAccessTokenIdentifier]) {
                 [_manager deleteKeyForIdentifier:kAccessTokenIdentifier];
                 [_manager registerKey:[responseItem objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
             } else {
                 [_manager registerKey:[responseItem objectForKey:@"access_token"] forIdentifier:kAccessTokenIdentifier];
             }
+            
             if ([_manager keyForIdentifier:kRefreshTokenIdentifier]) {
                 [_manager deleteKeyForIdentifier:kRefreshTokenIdentifier];
                 [_manager registerKey:[responseItem objectForKey:@"refresh_token"] forIdentifier:kRefreshTokenIdentifier];
             } else {
                 [_manager registerKey:[responseItem objectForKey:@"refresh_token"] forIdentifier:kRefreshTokenIdentifier];
+            }
+            
+            if ([_manager keyForIdentifier:kExpirationTokenIdentifier]) {
+                [_manager deleteKeyForIdentifier:kExpirationTokenIdentifier];
+                [_manager registerKey:[responseItem objectForKey:@"expires_in"] forIdentifier:kExpirationTokenIdentifier];
+            } else {
+                [_manager registerKey:[responseItem objectForKey:@"expires_in"] forIdentifier:kExpirationTokenIdentifier];
             }
         }
     }];

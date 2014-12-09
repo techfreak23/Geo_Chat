@@ -51,9 +51,11 @@ static NSString *reuseIdentifier = @"Cell";
     [GeoChatManager sharedManager].delegate = self;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRequestWithItem:) name:@"didFinishWithObject" object:_roomItems];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishWithRoomInfo" object:nil];
     
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.delegate = self;
+    NSLog(@"Just set location manager delegate");
     
     CLAuthorizationStatus locationServices = [CLLocationManager locationServicesEnabled];
     CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
@@ -155,6 +157,7 @@ static NSString *reuseIdentifier = @"Cell";
 {
     [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithObject" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableData:) name:@"didFinishAddingRoom" object:nil];
 }
 
@@ -165,6 +168,16 @@ static NSString *reuseIdentifier = @"Cell";
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     [_indicatorView stopAnimating];
    [self.tableView reloadData];
+}
+
+- (void)didFinishWithRoomInfo:(NSNotification *)notification
+{
+    NSLog(@"Notification from room received: %@", notification.description);
+    
+    MessagesViewController *controller = [[MessagesViewController alloc] init];
+    controller.roomInfo = (NSMutableDictionary *)[notification object];
+    
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)reloadTableData:(NSNotification *)notification
@@ -228,8 +241,6 @@ static NSString *reuseIdentifier = @"Cell";
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:reuseIdentifier];
     }
     
-    
-    
     cell.textLabel.text = [[_roomItems objectAtIndex:indexPath.row] objectForKey:@"name"];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %.2f", [[[_roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"] floatValue]];
     
@@ -242,17 +253,16 @@ static NSString *reuseIdentifier = @"Cell";
 {
     NSLog(@"Did select row: %@", [_roomItems objectAtIndex:indexPath.row]);
     
-    MessagesViewController *controller = [MessagesViewController messagesViewController];
-    controller.roomInfo = [_roomItems objectAtIndex:indexPath.row];
+    NSDictionary *temp = (NSDictionary *)[_roomItems objectAtIndex:indexPath.row];
     
-    [self.navigationController pushViewController:controller animated:YES];
+    [[GeoChatManager sharedManager] fetchRoomForID:[temp objectForKey:@"id"]];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    cell.layer.opacity = 0.5;
+    cell.layer.opacity = 0.4;
     
-    [UIView animateWithDuration:0.3 animations:^ {
+    [UIView animateWithDuration:0.5 animations:^ {
         cell.layer.opacity = 1.0;
     }];
 }
@@ -267,7 +277,7 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-    //NSLog(@"Auth status did change: %d", status);
+    NSLog(@"Auth status did change: %d", status);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -276,11 +286,6 @@ static NSString *reuseIdentifier = @"Cell";
     NSLog(@"Gathering location: %@", location);
     
     [manager stopUpdatingLocation];
-}
-
-- (void)updateRoomsAfterCreation
-{
-    [self.tableView reloadData];
 }
 
 @end

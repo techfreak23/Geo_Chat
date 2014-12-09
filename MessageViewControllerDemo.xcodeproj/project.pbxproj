@@ -64,6 +64,7 @@
 		0424410C1A2C0DBB004B0786 /* MasterViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410A1A2C0DBB004B0786 /* MasterViewController.xib */; };
 		042441101A2C0E00004B0786 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424410E1A2C0E00004B0786 /* LoginViewController.m */; };
 		042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410F1A2C0E00004B0786 /* LoginViewController.xib */; };
+		043583871A36AEB30054F9A5 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 042441061A2BE783004B0786 /* FacebookSDK.framework */; };
 		044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */; };
 		048074BB1A351983006DAD33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048074BA1A351983006DAD33 /* Security.framework */; };
 		048074FA1A35286F006DAD33 /* UYLPasswordManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074F91A35286F006DAD33 /* UYLPasswordManager.m */; };
@@ -76,7 +77,6 @@
 		048CF7451A2D610C004E20BE /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF7431A2D610C004E20BE /* SettingsViewController.xib */; };
 		048CF74A1A2D9565004E20BE /* GeoChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7471A2D9565004E20BE /* GeoChatManager.m */; };
 		048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7491A2D9565004E20BE /* GeoChatUser.m */; };
-		96B341C81A362EFA00F1EC58 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96B341C71A362EFA00F1EC58 /* FacebookSDK.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -234,7 +234,6 @@
 		048CF7471A2D9565004E20BE /* GeoChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatManager.m; sourceTree = "<group>"; };
 		048CF7481A2D9565004E20BE /* GeoChatUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeoChatUser.h; sourceTree = "<group>"; };
 		048CF7491A2D9565004E20BE /* GeoChatUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatUser.m; sourceTree = "<group>"; };
-		96B341C71A362EFA00F1EC58 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,7 +241,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96B341C81A362EFA00F1EC58 /* FacebookSDK.framework in Frameworks */,
+				043583871A36AEB30054F9A5 /* FacebookSDK.framework in Frameworks */,
 				048074BB1A351983006DAD33 /* Security.framework in Frameworks */,
 				0421F2BE1A3052DD00FCAB04 /* AudioToolbox.framework in Frameworks */,
 				042441051A2BE777004B0786 /* MapKit.framework in Frameworks */,
@@ -449,7 +448,6 @@
 		042440D01A2BE089004B0786 = {
 			isa = PBXGroup;
 			children = (
-				96B341C71A362EFA00F1EC58 /* FacebookSDK.framework */,
 				042440DB1A2BE089004B0786 /* MessageViewControllerDemo */,
 				042440F51A2BE089004B0786 /* MessageViewControllerDemoTests */,
 				042440DA1A2BE089004B0786 /* Products */,

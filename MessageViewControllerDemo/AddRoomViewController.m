@@ -126,7 +126,7 @@
     switch (indexPath.row) {
         case 0: {
             NSLog(@"Setting name text field...");
-            _roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width/2, cellFrame.size.height)];
+            _roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, cellFrame.size.height)];
             _roomNameField.translatesAutoresizingMaskIntoConstraints = NO;
             _roomNameField.placeholder = @"Room name";
             _roomNameField.delegate = self;

@@ -35,8 +35,12 @@
     self.senderId = _currentUser.userID;
     self.senderDisplayName = _currentUser.nickname;
     self.showLoadEarlierMessagesHeader = NO;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishWithRoomObject" object:_fullRoomInfo];
-    [[GeoChatManager sharedManager] fetchRoomForID:[_roomInfo objectForKey:@"id"]];
+    
+    NSLog(@"Room info: %@", _roomInfo);
+    
+    _messages = [_roomInfo objectForKey:@"messages"];
+    
+    [self createJSQMessages];
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,24 +49,18 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)didFinishWithRoomInfo:(NSNotification *)notification
-{
-    NSLog(@"Did finish with object: %@", notification.object);
-    _fullRoomInfo = notification.object;
-    NSLog(@"Full room info: %@", _fullRoomInfo);
-    _messages = [_fullRoomInfo objectForKey:@"messages"];
-    NSLog(@"Messages: %@", _messages);
-    [self createJSQMessages];
-}
-
 - (void)createJSQMessages
 {
     if (!_jsqMessages) {
+        NSLog(@"Initializing JSQ messages...");
         _jsqMessages = [[NSMutableArray alloc] init];
-        for (NSDictionary *tempDict in _messages) {
-            JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[tempDict objectForKey:@"user_id"] senderDisplayName:_currentUser.nickname date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
-            [_jsqMessages addObject:message];
+        if (_messages) {
+            NSLog(@"Messages does exist...");
+            for (NSDictionary *tempDict in _messages) {
+                JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[tempDict objectForKey:@"user_id"] senderDisplayName:@"techfreak23" date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
+                [_jsqMessages addObject:message];
         }
+    }
         [self.collectionView reloadData];
     }
 }

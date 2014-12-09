@@ -28,12 +28,21 @@
     
     [super viewDidLoad];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLoggingIn:) name:@"didFinishLoggingIn" object:nil];
+    
     self.title = @"Welcome to GeoChat!";
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
     // Do any additional setup after loading the view from its nib.
     _loginView.delegate = self;
     _loginView.readPermissions = @[@"public_profile", @"email"];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -75,11 +84,6 @@
 - (void)loginViewShowingLoggedInUser:(FBLoginView *)loginView
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
-    
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    
-    [self presentViewController:navController animated:NO completion:nil];
 }
 
 - (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView
@@ -87,6 +91,17 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
     UYLPasswordManager *manager = [UYLPasswordManager sharedInstance];
     [manager deleteKeyForIdentifier:kFacebookTokenIdentifier];
+}
+
+- (void)didFinishLoggingIn:(NSNotification *)notification
+{
+    NSLog(@"Should be showing the main view now...");
+    NSLog(@"Notification: %@", notification.description);
+    MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
+    
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+    
+    [self presentViewController:navController animated:NO completion:nil];
 }
 
 @end
