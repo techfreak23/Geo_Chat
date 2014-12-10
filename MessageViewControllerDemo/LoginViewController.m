@@ -31,6 +31,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLoggingIn:) name:@"didFinishLoggingIn" object:nil];
     
     self.title = @"Welcome to GeoChat!";
+    self.navigationController.navigationBarHidden = YES;
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
     // Do any additional setup after loading the view from its nib.

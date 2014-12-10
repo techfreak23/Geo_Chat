@@ -33,8 +33,8 @@
 
 static const NSString *ClientID = @"107d5e7228ae2c1c911a4ff910ceda2a05fca50ff951c271f6d3a7851f9bbdf5";
 static const NSString *ClientSecret = @"06dcef77d5ff607b7efae20f406b2667f8341e375819182870192a43c6461d16";
-NSString *AccessToken = @"70305874436ceefeb8a21c0753d29644978606e0674ee99bb743385ca08d5084";
-NSString *RefreshToken = @"618f10467ba68efdbc11da6a57d9e8024131365440ff23e0ac601e1847e263d9";
+NSString *AccessToken = @"603ce49bd16d49ed2faae6ca543abbb249a11b9283ab8223cf49e76a72aee90a";
+NSString *RefreshToken = @"d46bfae2f474b7f84f347038a86130e49d892864f88b1e4d8631de8970f63ff2";
 
 @implementation GeoChatManager
 
@@ -293,7 +293,7 @@ NSString *RefreshToken = @"618f10467ba68efdbc11da6a57d9e8024131365440ff23e0ac601
             if (httpResponse.statusCode == 201) {
                 dispatch_async(dispatch_get_main_queue(), ^ {
                     NSLog(@"should be sending message here...");
-                    [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingMessage" object:responseItem];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingWithSuccess" object:responseItem];
                 });
             } else if (httpResponse.statusCode == 500) {
                 NSLog(@"Internal server error...");

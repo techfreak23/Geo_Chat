@@ -30,10 +30,12 @@
     self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
     self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishSendingWithSuccess:) name:@"didFinishSendingWithSuccess" object:nil];
+    
     _currentUser = [GeoChatManager sharedManager].currentUser;
     NSLog(@"Current user: %@", _currentUser);
-    self.senderId = _currentUser.userID;
-    self.senderDisplayName = _currentUser.nickname;
+    self.senderId = (NSString *)_currentUser.userID;
+    self.senderDisplayName = (NSString *)_currentUser.nickname;
     self.showLoadEarlierMessagesHeader = NO;
     
     NSLog(@"Room info: %@", _roomInfo);
@@ -41,6 +43,13 @@
     _messages = [_roomInfo objectForKey:@"messages"];
     
     [self createJSQMessages];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -57,12 +66,18 @@
         if (_messages) {
             NSLog(@"Messages does exist...");
             for (NSDictionary *tempDict in _messages) {
-                JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[tempDict objectForKey:@"user_id"] senderDisplayName:@"techfreak23" date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
+                JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [tempDict objectForKey:@"user_id"]] senderDisplayName:@"techfreak23" date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
                 [_jsqMessages addObject:message];
         }
     }
         [self.collectionView reloadData];
     }
+}
+
+- (void)didFinishSendingWithSuccess:(NSNotification *)notification
+{
+    NSLog(@"Did finish with success!: %@", notification.description);
+    [self finishSendingMessage];
 }
 
 #pragma mark - 
@@ -198,11 +213,9 @@
     NSString *roomID = [_roomInfo objectForKey:@"id"];
     [[GeoChatManager sharedManager] sendMessageWithText:text forChatRoomID:roomID];
     
-    //JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:senderId senderDisplayName:senderDisplayName date:date text:text];
+    JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", senderId] senderDisplayName:(NSString *)senderDisplayName date:date text:text];
     
-    //[_jsqMessages addObject:newMessage];
-    
-    [self finishSendingMessage];
+    [_jsqMessages addObject:newMessage];
 }
 
 
