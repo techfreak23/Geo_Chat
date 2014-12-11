@@ -66,7 +66,8 @@
         if (self.messages) {
             NSLog(@"Messages does exist...");
             for (NSDictionary *tempDict in self.messages) {
-                JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [tempDict objectForKey:@"user_id"]] senderDisplayName:@"techfreak23" date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
+                NSLog(@"Temp dict: %@", tempDict);
+                JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [tempDict objectForKey:@"user_id"]] senderDisplayName:[tempDict objectForKey:@"user_name"] date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
                 [self.jsqMessages addObject:message];
         }
     }

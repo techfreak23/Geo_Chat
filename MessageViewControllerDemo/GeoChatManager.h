@@ -37,6 +37,7 @@ typedef void (^RequestCompletion)(id responseItem, NSURLResponse *response, NSEr
 - (void)sendMessageWithText:(NSString *)message forChatRoomID:(NSString *)roomID;
 - (void)listChatroomsForUser;
 - (void)fetchNewMessagesForRoom:(NSString *)roomID index:(NSString *)index;
+- (void)addUserToRoom:(NSString *)roomID;
 
 
 @end

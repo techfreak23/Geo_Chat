@@ -152,7 +152,7 @@ BOOL isAuth;
     CLLocation *location = self.locationManager.location;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
-    [[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"40" radius:@"100"];
+    [[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"50" radius:@"100"];
 }
 
 - (void)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton
@@ -201,7 +201,27 @@ BOOL isAuth;
     
     MessagesViewController *controller = [[MessagesViewController alloc] init];
     controller.roomInfo = (NSMutableDictionary *)[notification object];
+    NSLog(@"controller room info: %@", controller.roomInfo);
     controller.currentUser = [[GeoChatManager sharedManager] currentUser];
+    NSArray *tempArray = [controller.roomInfo objectForKey:@"users"];
+    
+    BOOL inRoom = NO;
+    
+    for (NSDictionary *tempDict in tempArray) {
+        NSString *intString = controller.currentUser.userID;
+        NSString *tempString = [tempDict objectForKey:@"id"];
+        
+        if ([intString intValue] == [tempString intValue]) {
+            inRoom = YES;
+            NSLog(@"User is already in room...");
+        }
+    }
+    
+    if (!inRoom) {
+        NSLog(@"Adding user to room...");
+        [[GeoChatManager sharedManager] addUserToRoom:[controller.roomInfo objectForKey:@"id"]];
+    }
+    
     
     [self.navigationController pushViewController:controller animated:YES];
 }

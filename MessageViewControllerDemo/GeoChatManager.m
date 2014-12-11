@@ -158,6 +158,8 @@ NSString *RefreshToken;
                 int expiresIn = [expIn intValue];
                 
                 if (expiresIn < 1200) {
+                    AccessToken = [self.authTokens objectForKey:@"access_token"];
+                    RefreshToken = [self.authTokens objectForKey:@"refresh_token"];
                     [self refreshAccessToken];
                 } else {
                     AccessToken = [self.authTokens objectForKey:@"access_token"];
@@ -305,12 +307,27 @@ NSString *RefreshToken;
     return [NSString stringWithFormat:@"%@/retrieve_messages?access_token=%@&id=%@&index=%@", kChatRoomEndpoint, AccessToken, roomID, index];
 }
 
+- (void)addUserToRoom:(NSString *)roomID
+{
+    NSString *urlString = [NSString stringWithFormat:@"%@/add_user", kChatRoomEndpoint];
+    NSDictionary *paramDict = @{@"access_token": AccessToken, @"id": roomID};
+    [self sendPostRequestForEndpoint:urlString withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
+        if (!error) {
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishAddingToRoom" object:nil];
+            });
+        } else {
+            NSLog(@"Something went wrong with adding the user...");
+        }
+    }];
+}
+
 //gathers a list of all active chat rooms for the user
 - (void)listChatroomsForUser
 {
     [self sendGetRequestForEndpoint:[self fetchRoomListForUserString] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         if (!error) {
-            NSLog(@"");
+            NSLog(@"Those rooms though...");
         }
     }];
 }
