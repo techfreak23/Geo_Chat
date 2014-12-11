@@ -21,7 +21,7 @@
 #define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 #define IS_IOS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 
-@interface MasterViewController () <GeoChatManagerDelegate, CLLocationManagerDelegate>
+@interface MasterViewController () <CLLocationManagerDelegate>
 
 @property (nonatomic, strong) NSMutableArray *roomItems;
 @property (nonatomic, strong) NSMutableArray *joinedRooms;
@@ -57,11 +57,8 @@ BOOL isAuth;
     [self.view addSubview:self.indicatorView];
     [self.indicatorView startAnimating];
     
-    [GeoChatManager sharedManager].delegate = self;
-    
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
-    NSLog(@"Just set location manager delegate");
     
     CLAuthorizationStatus locationServices = [CLLocationManager locationServicesEnabled];
     CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
@@ -169,12 +166,10 @@ BOOL isAuth;
         [self fetchRooms];
     }
     
-   // NSIndexPath *selectedPath = [self.tableView indexPathForSelectedRow];
-    //[self.tableView deselectRowAtIndexPath:selectedPath animated:YES];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRequestWithItem:) name:@"didFinishWithObject" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishWithRoomInfo" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishAddingToRoom:) name:@"didFinishAddingToRoom" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingRoom" object:nil];
-    NSLog(@"Room items upon appearance: %@", self.roomItems);
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -182,6 +177,7 @@ BOOL isAuth;
     [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithObject" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithRoomInfo" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingToRoom" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableData:) name:@"didFinishAddingRoom" object:nil];
 }
 
@@ -203,27 +199,16 @@ BOOL isAuth;
     controller.roomInfo = (NSMutableDictionary *)[notification object];
     NSLog(@"controller room info: %@", controller.roomInfo);
     controller.currentUser = [[GeoChatManager sharedManager] currentUser];
-    NSArray *tempArray = [controller.roomInfo objectForKey:@"users"];
-    
-    BOOL inRoom = NO;
-    
-    for (NSDictionary *tempDict in tempArray) {
-        NSString *intString = controller.currentUser.userID;
-        NSString *tempString = [tempDict objectForKey:@"id"];
-        
-        if ([intString intValue] == [tempString intValue]) {
-            inRoom = YES;
-            NSLog(@"User is already in room...");
-        }
-    }
-    
-    if (!inRoom) {
-        NSLog(@"Adding user to room...");
-        [[GeoChatManager sharedManager] addUserToRoom:[controller.roomInfo objectForKey:@"id"]];
-    }
-    
     
     [self.navigationController pushViewController:controller animated:YES];
+}
+
+- (void)didFinishAddingToRoom:(NSNotification *)notification
+{
+    NSLog(@"We're all good here: %@", notification.description);
+    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+    
+    [[GeoChatManager sharedManager] fetchRoomForID:[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"id"]];
 }
 
 - (void)reloadTableData:(NSNotification *)notification
@@ -234,11 +219,6 @@ BOOL isAuth;
     [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     
     [self fetchRooms];
-}
-
-- (void)didFinishRequestWithSuccessItem:(NSMutableArray *)roomList
-{
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -299,8 +279,8 @@ BOOL isAuth;
     NSLog(@"Did select row: %@", [self.roomItems objectAtIndex:indexPath.row]);
     
     NSDictionary *temp = (NSDictionary *)[self.roomItems objectAtIndex:indexPath.row];
-    
-    [[GeoChatManager sharedManager] fetchRoomForID:[temp objectForKey:@"id"]];
+    [[GeoChatManager sharedManager] addUserToRoom:[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"id"]];
+    //[[GeoChatManager sharedManager] fetchRoomForID:[temp objectForKey:@"id"]];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath

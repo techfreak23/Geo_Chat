@@ -9,23 +9,11 @@
 #import <Foundation/Foundation.h>
 #import "GeoChatUser.h"
 
-@class GeoChatManager;
-
-@protocol GeoChatManagerDelegate
-
-@optional
-
-- (void)didFinishRequestWithSuccessItem:(NSMutableArray *)roomList;
-- (void)didFinishRequestWithFailure;
-
-@end
-
 typedef void (^RequestCompletion)(id responseItem, NSURLResponse *response, NSError *error);
 
 
 @interface GeoChatManager : NSObject
 
-@property (nonatomic, weak) id <GeoChatManagerDelegate> delegate;
 @property (nonatomic, strong) GeoChatUser *currentUser;
 
 + (GeoChatManager *)sharedManager;
