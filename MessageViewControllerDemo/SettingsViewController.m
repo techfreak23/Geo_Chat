@@ -127,4 +127,22 @@
     
 }
 
+- (void)actionSheet:(UIActionSheet *)actionSheet willDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    switch (buttonIndex) {
+        case 0:
+            NSLog(@"Logging out...");
+            break;
+            
+        case 1: {
+            NSIndexPath *selected = [self.tableView indexPathForSelectedRow];
+            [self.tableView deselectRowAtIndexPath:selected animated:YES];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
 @end

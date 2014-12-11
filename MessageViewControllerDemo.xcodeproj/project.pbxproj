@@ -64,7 +64,6 @@
 		0424410C1A2C0DBB004B0786 /* MasterViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410A1A2C0DBB004B0786 /* MasterViewController.xib */; };
 		042441101A2C0E00004B0786 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0424410E1A2C0E00004B0786 /* LoginViewController.m */; };
 		042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410F1A2C0E00004B0786 /* LoginViewController.xib */; };
-		043583871A36AEB30054F9A5 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 042441061A2BE783004B0786 /* FacebookSDK.framework */; };
 		044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */; };
 		048074BB1A351983006DAD33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048074BA1A351983006DAD33 /* Security.framework */; };
 		048074FA1A35286F006DAD33 /* UYLPasswordManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074F91A35286F006DAD33 /* UYLPasswordManager.m */; };
@@ -77,6 +76,7 @@
 		048CF7451A2D610C004E20BE /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF7431A2D610C004E20BE /* SettingsViewController.xib */; };
 		048CF74A1A2D9565004E20BE /* GeoChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7471A2D9565004E20BE /* GeoChatManager.m */; };
 		048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7491A2D9565004E20BE /* GeoChatUser.m */; };
+		965108491A3945DA00AACBFE /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965108481A3945DA00AACBFE /* FacebookSDK.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -207,7 +207,6 @@
 		042440F71A2BE089004B0786 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		042440F81A2BE089004B0786 /* MessageViewControllerDemoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageViewControllerDemoTests.m; sourceTree = "<group>"; };
 		042441041A2BE777004B0786 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		042441061A2BE783004B0786 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
 		042441081A2C0DBB004B0786 /* MasterViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
 		042441091A2C0DBB004B0786 /* MasterViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
 		0424410A1A2C0DBB004B0786 /* MasterViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MasterViewController.xib; sourceTree = "<group>"; };
@@ -234,6 +233,7 @@
 		048CF7471A2D9565004E20BE /* GeoChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatManager.m; sourceTree = "<group>"; };
 		048CF7481A2D9565004E20BE /* GeoChatUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeoChatUser.h; sourceTree = "<group>"; };
 		048CF7491A2D9565004E20BE /* GeoChatUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatUser.m; sourceTree = "<group>"; };
+		965108481A3945DA00AACBFE /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -241,7 +241,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				043583871A36AEB30054F9A5 /* FacebookSDK.framework in Frameworks */,
+				965108491A3945DA00AACBFE /* FacebookSDK.framework in Frameworks */,
 				048074BB1A351983006DAD33 /* Security.framework in Frameworks */,
 				0421F2BE1A3052DD00FCAB04 /* AudioToolbox.framework in Frameworks */,
 				042441051A2BE777004B0786 /* MapKit.framework in Frameworks */,
@@ -436,9 +436,9 @@
 		0421F2C41A30531000FCAB04 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				965108481A3945DA00AACBFE /* FacebookSDK.framework */,
 				048074BA1A351983006DAD33 /* Security.framework */,
 				0421F2BD1A3052DD00FCAB04 /* AudioToolbox.framework */,
-				042441061A2BE783004B0786 /* FacebookSDK.framework */,
 				042441041A2BE777004B0786 /* MapKit.framework */,
 			);
 			name = Frameworks;
@@ -860,6 +860,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/mac/Documents/FacebookSDK,
@@ -875,6 +876,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/mac/Documents/FacebookSDK,

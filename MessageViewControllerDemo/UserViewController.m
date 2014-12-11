@@ -49,23 +49,23 @@
     
     switch (indexPath.row) {
         case 0:
-            cell.textLabel.text = [NSString stringWithFormat:@"Nickname: %@", _currentUser.nickname];
+            cell.textLabel.text = [NSString stringWithFormat:@"Nickname: %@", self.currentUser.nickname];
             break;
             
         case 1:
-            cell.textLabel.text = [NSString stringWithFormat:@"id: %@", _currentUser.userID];
+            cell.textLabel.text = [NSString stringWithFormat:@"id: %@", self.currentUser.userID];
             break;
             
         case 2:
-            cell.textLabel.text = [NSString stringWithFormat:@"facebook id: %@", _currentUser.fbID];
+            cell.textLabel.text = [NSString stringWithFormat:@"facebook id: %@", self.currentUser.fbID];
             break;
             
         case 3:
-            cell.textLabel.text = [NSString stringWithFormat:@"full name: %@", _currentUser.fbName];
+            cell.textLabel.text = [NSString stringWithFormat:@"full name: %@", self.currentUser.fbName];
             break;
             
         case 4:
-            cell.textLabel.text = [NSString stringWithFormat:@"created: %@", _currentUser.createdAt];
+            cell.textLabel.text = [NSString stringWithFormat:@"created: %@", self.currentUser.createdAt];
             break;
             
         default:
@@ -73,6 +73,45 @@
     }
     
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+    switch (indexPath.row) {
+        case 0:
+            NSLog(@"Nickname cell");
+            break;
+            
+        case 1:
+            NSLog(@"ID cell");
+            break;
+            
+        case 2: {
+            NSLog(@"Facebook ID cell");
+            
+            NSURL *facebookURL = [NSURL URLWithString:[NSString stringWithFormat:@"fb://profile/%@", self.currentUser.fbID]];
+            if ([[UIApplication sharedApplication] canOpenURL:facebookURL]) {
+                [[UIApplication sharedApplication] openURL:facebookURL];
+            } else {
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://facebook.com"]];
+            }
+        }
+            break;
+            
+        case 3:
+            
+            break;
+            
+        case 4:
+            
+            break;
+            
+        default:
+            break;
+    }
+    
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

@@ -118,7 +118,7 @@
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.translatesAutoresizingMaskIntoConstraints = NO;
-    
+    [cell.contentView sizeToFit];
     
     CGRect cellFrame = cell.frame;
     

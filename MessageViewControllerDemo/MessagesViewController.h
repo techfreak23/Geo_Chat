@@ -8,9 +8,11 @@
 
 #import "JSQMessagesViewController.h"
 #import "JSQMessages.h"
+#import "GeoChatManager.h"
 
 @interface MessagesViewController : JSQMessagesViewController
 
 @property (nonatomic, strong) NSMutableDictionary *roomInfo;
+@property (nonatomic, strong) GeoChatUser *currentUser;
 
 @end

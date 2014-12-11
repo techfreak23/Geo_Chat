@@ -12,12 +12,12 @@
 
 - (void)configureUserForDictionary:(NSMutableDictionary *)userInfo
 {
-    _userID = [userInfo objectForKey:@"id"];
-    _nickname = [userInfo objectForKey:@"nick_name"];
-    _fbID = [userInfo objectForKey:@"fb_id"];
-    _fbName = [userInfo objectForKey:@"fb_name"];
-    _createdAt = [userInfo objectForKey:@"created_at"];
-    _updatedAt = [userInfo objectForKey:@"updated_at"];
+    self.userID = [userInfo objectForKey:@"id"];
+    self.nickname = [userInfo objectForKey:@"nick_name"];
+    self.fbID = [userInfo objectForKey:@"fb_id"];
+    self.fbName = [userInfo objectForKey:@"fb_name"];
+    self.createdAt = [userInfo objectForKey:@"created_at"];
+    self.updatedAt = [userInfo objectForKey:@"updated_at"];
 }
 
 @end

@@ -7,14 +7,13 @@
 //
 
 #import "MessagesViewController.h"
-#import "GeoChatManager.h"
+
 
 @interface MessagesViewController () <UIAlertViewDelegate, UIActionSheetDelegate>
 
 @property (nonatomic, strong) NSMutableDictionary *fullRoomInfo;
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) NSMutableArray *jsqMessages;
-@property (nonatomic, strong) GeoChatUser *currentUser;
 
 @end
 
@@ -25,22 +24,23 @@
     NSLog(@"Messages view loading...");
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.title = [_roomInfo objectForKey:@"name"];
+    self.title = [self.roomInfo objectForKey:@"name"];
     
     self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
     self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
     
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishSendingWithSuccess:) name:@"didFinishSendingWithSuccess" object:nil];
     
-    _currentUser = [GeoChatManager sharedManager].currentUser;
-    NSLog(@"Current user: %@", _currentUser);
-    self.senderId = (NSString *)_currentUser.userID;
-    self.senderDisplayName = (NSString *)_currentUser.nickname;
+    self.currentUser = [GeoChatManager sharedManager].currentUser;
+    NSLog(@"Current user: %@", self.currentUser);
+    self.senderId = (NSString *)self.currentUser.userID;
+    self.senderDisplayName = (NSString *)self.currentUser.nickname;
     self.showLoadEarlierMessagesHeader = NO;
     
-    NSLog(@"Room info: %@", _roomInfo);
+    NSLog(@"Room info: %@", self.roomInfo);
     
-    _messages = [_roomInfo objectForKey:@"messages"];
+    self.messages = [self.roomInfo objectForKey:@"messages"];
     
     [self createJSQMessages];
 }
@@ -60,23 +60,26 @@
 
 - (void)createJSQMessages
 {
-    if (!_jsqMessages) {
+    if (!self.jsqMessages) {
         NSLog(@"Initializing JSQ messages...");
-        _jsqMessages = [[NSMutableArray alloc] init];
-        if (_messages) {
+        self.jsqMessages = [[NSMutableArray alloc] init];
+        if (self.messages) {
             NSLog(@"Messages does exist...");
-            for (NSDictionary *tempDict in _messages) {
+            for (NSDictionary *tempDict in self.messages) {
                 JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [tempDict objectForKey:@"user_id"]] senderDisplayName:@"techfreak23" date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
-                [_jsqMessages addObject:message];
+                [self.jsqMessages addObject:message];
         }
     }
         [self.collectionView reloadData];
     }
 }
 
+
+
 - (void)didFinishSendingWithSuccess:(NSNotification *)notification
 {
     NSLog(@"Did finish with success!: %@", notification.description);
+    [JSQSystemSoundPlayer jsq_playMessageSentSound];
     [self finishSendingMessage];
 }
 
@@ -85,58 +88,63 @@
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    return _jsqMessages.count;
+    return self.jsqMessages.count;
 }
 
 - (id<JSQMessageData>)collectionView:(JSQMessagesCollectionView *)collectionView messageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    return [_jsqMessages objectAtIndex:indexPath.item];
+    return [self.jsqMessages objectAtIndex:indexPath.item];
 }
 
 - (id<JSQMessageBubbleImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView messageBubbleImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    JSQMessage *message = [_jsqMessages objectAtIndex:indexPath.item];
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc] init];
+    JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
-    if ([message.senderId isEqualToString:self.senderId]) {
-        return [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleBlueColor]];
+    NSLog(@"message id: %@\nmy id: %@", message.senderId, self.senderId);
+    
+    if ([message.senderId intValue] == [self.senderId intValue]) {
+        NSLog(@"YESSIR it outgoing");
+        return [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleBlueColor]];
+    } else {
+        NSLog(@"NOOOOSIR it's incoming");
+        return [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleLightGrayColor]];
     }
-    
-    return [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleLightGrayColor]];
+
 }
 
 - (id<JSQMessageAvatarImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView avatarImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     return nil;
 }
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     return nil;
 }
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForCellBottomLabelAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     return nil;
 }
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    JSQMessage *message = [_jsqMessages objectAtIndex:indexPath.item];
+    JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
-    if ([message.senderId isEqualToString:self.senderId]) {
+    if ([message.senderId intValue] == [self.senderId intValue]) {
         return nil;
     }
     
     if (indexPath.item - 1 > 0) {
-        JSQMessage *prevMessage = [_jsqMessages objectAtIndex:indexPath.item - 1];
-        if ([prevMessage.senderId isEqualToString:message.senderId]) {
+        JSQMessage *prevMessage = [self.jsqMessages objectAtIndex:indexPath.item - 1];
+        if ([prevMessage.senderId intValue] == [message.senderId intValue]) {
             return nil;
         }
     }
@@ -146,17 +154,17 @@
 
 - (UICollectionViewCell *)collectionView:(JSQMessagesCollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     JSQMessagesCollectionViewCell *cell = (JSQMessagesCollectionViewCell *)[super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
-    JSQMessage *message = [_jsqMessages objectAtIndex:indexPath.item];
+    JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
     NSLog(@"Message at index path %ld message: %@", (long)indexPath.item, message);
     
-    if ([message.senderId isEqualToString:self.senderId]) {
-        cell.textView.textColor = [UIColor blackColor];
-    } else {
+    if ([message.senderId intValue] == [self.senderId intValue]) {
         cell.textView.textColor = [UIColor whiteColor];
+    } else {
+        cell.textView.textColor = [UIColor blackColor];
     }
     
     cell.textView.linkTextAttributes = @{ NSForegroundColorAttributeName : cell.textView.textColor,
@@ -168,22 +176,22 @@
 - (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
                    layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellTopLabelAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     return 0.0f;
 }
 
 - (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
                    layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    JSQMessage *currentMessage = [_jsqMessages objectAtIndex:indexPath.item];
-    if ([currentMessage.senderId isEqualToString:self.senderId]) {
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
+    JSQMessage *currentMessage = [self.jsqMessages objectAtIndex:indexPath.item];
+    if ([currentMessage.senderId intValue] == [self.senderId intValue]) {
         return 0.0f;
     }
     
     if (indexPath.item - 1 > 0) {
-        JSQMessage *previousMessage = [_jsqMessages objectAtIndex:indexPath.item - 1];
-        if ([previousMessage.senderId isEqualToString:currentMessage.senderId]) {
+        JSQMessage *previousMessage = [self.jsqMessages objectAtIndex:indexPath.item - 1];
+        if ([previousMessage.senderId intValue] == [currentMessage.senderId intValue]) {
             return 0.0f;
         }
     }
@@ -194,13 +202,13 @@
 - (CGFloat)collectionView:(JSQMessagesCollectionView *)collectionView
                    layout:(JSQMessagesCollectionViewFlowLayout *)collectionViewLayout heightForCellBottomLabelAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     return 0.0f;
 }
 
 - (void)collectionView:(JSQMessagesCollectionView *)collectionView didTapCellAtIndexPath:(NSIndexPath *)indexPath touchLocation:(CGPoint)touchLocation
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     NSLog(@"Tapped cell at %@!", NSStringFromCGPoint(touchLocation));
 }
 
@@ -210,12 +218,12 @@
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     NSLog(@"Did press send button with button: %@\nmessage: %@\nsenderID: %@\nDisplay Name: %@", button, text, senderId, senderDisplayName);
-    NSString *roomID = [_roomInfo objectForKey:@"id"];
+    NSString *roomID = [self.roomInfo objectForKey:@"id"];
     [[GeoChatManager sharedManager] sendMessageWithText:text forChatRoomID:roomID];
     
     JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", senderId] senderDisplayName:(NSString *)senderDisplayName date:date text:text];
     
-    [_jsqMessages addObject:newMessage];
+    [self.jsqMessages addObject:newMessage];
 }
 
 
