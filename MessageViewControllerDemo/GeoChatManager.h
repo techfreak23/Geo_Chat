@@ -15,6 +15,7 @@ typedef void (^RequestCompletion)(id responseItem, NSURLResponse *response, NSEr
 @interface GeoChatManager : NSObject
 
 @property (nonatomic, strong) GeoChatUser *currentUser;
+@property BOOL isLoggedIn;
 
 + (GeoChatManager *)sharedManager;
 

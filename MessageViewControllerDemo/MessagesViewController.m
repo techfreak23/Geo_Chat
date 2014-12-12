@@ -26,6 +26,9 @@
     // Do any additional setup after loading the view.
     self.title = [self.roomInfo objectForKey:@"name"];
     
+    //self.collectionView.collectionViewLayout.springinessEnabled = YES;
+    //self.collectionView.collectionViewLayout.springResistanceFactor = 9000;
+    
     self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
     self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
     
@@ -158,6 +161,8 @@
     //NSLog(@"%s", __PRETTY_FUNCTION__);
     JSQMessagesCollectionViewCell *cell = (JSQMessagesCollectionViewCell *)[super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
+    //CGRect frame = [[UIScreen mainScreen] bounds];
+    
     JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
     NSLog(@"Message at index path %ld message: %@", (long)indexPath.item, message);
@@ -167,7 +172,8 @@
     } else {
         cell.textView.textColor = [UIColor blackColor];
     }
-    
+    //frame.size.height = cell.frame.size.height;
+    //cell.frame = frame;
     cell.textView.linkTextAttributes = @{ NSForegroundColorAttributeName : cell.textView.textColor,
                                           NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle | NSUnderlinePatternSolid) };
     

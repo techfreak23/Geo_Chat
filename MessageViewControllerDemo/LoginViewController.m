@@ -52,17 +52,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)loginButtonAction:(id)sender
-{
-    NSLog(@"Login button pressed...");
-    
-    MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
-    
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    
-    [self presentViewController:navController animated:YES completion:nil];
-}
-
 - (void)loginView:(FBLoginView *)loginView handleError:(NSError *)error
 {
     NSLog(@"%s %@", __PRETTY_FUNCTION__, error);

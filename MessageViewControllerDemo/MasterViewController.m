@@ -52,7 +52,9 @@ BOOL isAuth;
     
     self.tableView.scrollEnabled = NO;
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(100, 320, 200.0, 200.0)];
+    CGRect frame = [[UIScreen mainScreen] bounds];
+    
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(frame.size.width/2, frame.size.height/2, 200.0, 200.0)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     [self.view addSubview:self.indicatorView];
     [self.indicatorView startAnimating];
@@ -279,15 +281,15 @@ BOOL isAuth;
     NSLog(@"Did select row: %@", [self.roomItems objectAtIndex:indexPath.row]);
     
     NSDictionary *temp = (NSDictionary *)[self.roomItems objectAtIndex:indexPath.row];
-    [[GeoChatManager sharedManager] addUserToRoom:[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"id"]];
+    [[GeoChatManager sharedManager] addUserToRoom:[temp objectForKey:@"id"]];
     //[[GeoChatManager sharedManager] fetchRoomForID:[temp objectForKey:@"id"]];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    cell.layer.opacity = 0.4;
+    cell.layer.opacity = 0.5;
     
-    [UIView animateWithDuration:0.5 animations:^ {
+    [UIView animateWithDuration:0.25 animations:^ {
         cell.layer.opacity = 1.0;
     }];
 }

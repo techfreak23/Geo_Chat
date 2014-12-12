@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "MasterViewController.h"
 #import "LoginViewController.h"
+#import "GeoChatManager.h"
 
 @interface AppDelegate ()
 
@@ -29,6 +30,17 @@ BOOL loggedIn = NO;
     [LoginViewController class];
     
     UIViewController *controller;
+    
+    /*
+    if ([FBSession openActiveSessionWithAllowLoginUI:NO]) {
+        NSLog(@"We're good here... app delegate");
+        controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
+        [[GeoChatManager sharedManager] loginWithFacebookID:[[[FBSession activeSession] accessTokenData] accessToken]];
+    } else {
+        NSLog(@"Please show this joker the login view");
+        controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
+    }
+    */
     
     if ([FBSession activeSession].isOpen) {
         NSLog(@"The session is still open...");
@@ -52,6 +64,7 @@ BOOL loggedIn = NO;
         NSLog(@"Possibly a first time user.... because the session isnt open?");
         controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
     }
+    
     
     /*
     if (loggedIn) {

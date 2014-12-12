@@ -28,7 +28,7 @@
 {
     [super viewDidLoad];
     
-    _menuItems = @[@"Text field view", @"Location view", @"Map view"];
+    self.menuItems = @[@"Text field view", @"Location view", @"Map view"];
     
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
@@ -57,22 +57,24 @@
 
 - (void)cancelAdd
 {
+    [self.roomNameField resignFirstResponder];
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)createNewRoom
 {
     NSLog(@"Create room...");
-    MKUserLocation *location = _mapView.userLocation;
+    MKUserLocation *location = self.mapView.userLocation;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
     
-    [[GeoChatManager sharedManager] createRoomWithName:_roomNameField.text latitude:latitude longitude:longitude];
+    [[GeoChatManager sharedManager] createRoomWithName:self.roomNameField.text latitude:latitude longitude:longitude];
 }
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
     NSLog(@"Did finish creating room: %@", [notification object]);
+    [self.roomNameField resignFirstResponder];
     [self.presentingViewController dismissViewControllerAnimated:YES completion: ^{
         NSLog(@"Dismissed add room view with completion...");
         [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishAddingRoom" object:[notification object]];
@@ -82,16 +84,16 @@
 - (void)updateLocation
 {
     CLGeocoder *geoCoder = [[CLGeocoder alloc] init];
-    [geoCoder reverseGeocodeLocation:_mapView.userLocation.location completionHandler:^(NSArray *placemarks, NSError *error) {
+    [geoCoder reverseGeocodeLocation:self.mapView.userLocation.location completionHandler:^(NSArray *placemarks, NSError *error) {
         for (CLPlacemark *placemark in placemarks) {
             NSString *cityName = [placemark locality];
             NSLog(@"City: %@", cityName);
-            _locationLabel.text = cityName;
+            self.locationLabel.text = cityName;
         }
     }];
-    MKUserLocation *userLocation = _mapView.userLocation;
+    MKUserLocation *userLocation = self.mapView.userLocation;
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
-    [_mapView setRegion:region animated:YES];
+    [self.mapView setRegion:region animated:YES];
 }
 
 #pragma mark - Table view data source
@@ -105,7 +107,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return _menuItems.count;
+    return self.menuItems.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -116,56 +118,64 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
     
+    CGRect frame = [[UIScreen mainScreen] bounds];
+    
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.translatesAutoresizingMaskIntoConstraints = NO;
     [cell.contentView sizeToFit];
+    frame.size.height = cell.frame.size.height;
+    frame.origin = cell.frame.origin;
+    cell.frame = frame;
+    cell.contentView.frame = frame;
     
     CGRect cellFrame = cell.frame;
-    
+    CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
+    CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
     
     switch (indexPath.row) {
         case 0: {
             NSLog(@"Setting name text field...");
-            _roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, cellFrame.size.height)];
-            _roomNameField.translatesAutoresizingMaskIntoConstraints = NO;
-            _roomNameField.placeholder = @"Room name";
-            _roomNameField.delegate = self;
-            [cell.contentView addSubview:_roomNameField];
+            self.roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(10, 5, cellFrame.size.width - 10, cellFrame.size.height - 5)];
+            self.roomNameField.translatesAutoresizingMaskIntoConstraints = NO;
+            self.roomNameField.placeholder = @"Room name";
+            self.roomNameField.delegate = self;
+            [cell.contentView addSubview:self.roomNameField];
         }
             break;
             
         case 1: {
             NSLog(@"Setting location label...");
-            _locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width/2, cellFrame.size.height)];
-            _locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
-            _locationLabel.text = @"Getting location...";
-            _locationLabel.textAlignment = NSTextAlignmentCenter;
+            self.locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width/2, cellFrame.size.height)];
+            self.locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
+            self.locationLabel.text = @"Getting location...";
+            self.locationLabel.textAlignment = NSTextAlignmentCenter;
+            self.locationLabel.backgroundColor = [UIColor lightGrayColor];
             
-            _updateButton = [[UIButton alloc] initWithFrame:CGRectMake(_locationLabel.frame.size.width, _locationLabel.frame.origin.y, cellFrame.size.width/2, cellFrame.size.height)];
-            _updateButton.translatesAutoresizingMaskIntoConstraints = NO;
-            [_updateButton addTarget:self action:@selector(updateLocation) forControlEvents:UIControlEventTouchUpInside];
-            _updateButton.titleLabel.textColor = [UIColor blackColor];
-            [_updateButton setTitle:@"Update location" forState:UIControlStateNormal];
-            _updateButton.backgroundColor = [UIColor purpleColor];
+            self.updateButton = [[UIButton alloc] initWithFrame:CGRectMake(self.locationLabel.frame.size.width, self.locationLabel.frame.origin.y, self.locationLabel.frame.size.width, self.locationLabel.frame.size.height)];
+            self.updateButton.translatesAutoresizingMaskIntoConstraints = NO;
+            [self.updateButton addTarget:self action:@selector(updateLocation) forControlEvents:UIControlEventTouchUpInside];
+            self.updateButton.titleLabel.textColor = [UIColor blackColor];
+            [self.updateButton setTitle:@"Update location" forState:UIControlStateNormal];
+            self.updateButton.backgroundColor = [UIColor purpleColor];
             
-            [cell.contentView addSubview:_updateButton];
-            [cell.contentView addSubview:_locationLabel];
+            [cell.contentView addSubview:self.updateButton];
+            [cell.contentView addSubview:self.locationLabel];
         }
             break;
             
         case 2: {
             NSLog(@"Setting map view...");
-            _mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
-            _mapView.delegate = self;
-            [cell.contentView addSubview:_mapView];
-            _mapView.showsUserLocation = YES;
+            self.mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, self.view.frame.size.height - statusHeight - navHeight - (cellFrame.size.height * 2))];
+            self.mapView.delegate = self;
+            [cell.contentView addSubview:self.mapView];
+            self.mapView.showsUserLocation = YES;
         }
             
         default:
             break;
     }
     
-    NSLog(@"Table cell loading: %@", [_menuItems objectAtIndex:indexPath.row]);
+    NSLog(@"Table cell loading: %@", [self.menuItems objectAtIndex:indexPath.row]);
     
     return cell;
 }

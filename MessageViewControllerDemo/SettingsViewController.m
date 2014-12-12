@@ -30,7 +30,7 @@
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(closeSettings)];
     
-    _menuItems = @[@"View profile", @"Change nickname", @"Logout"];
+    self.menuItems = @[@"View profile", @"Change nickname", @"Logout"];
 }
 
 - (void)didReceiveMemoryWarning
@@ -56,7 +56,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return _menuItems.count;
+    return self.menuItems.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -67,7 +67,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
     
-    cell.textLabel.text = [_menuItems objectAtIndex:indexPath.row];
+    cell.textLabel.text = [self.menuItems objectAtIndex:indexPath.row];
     
     return cell;
 }

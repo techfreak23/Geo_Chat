@@ -21,8 +21,8 @@ static NSString *reuseIdentifier = @"Cell";
     [super viewDidLoad];
     
     self.title = @"User info";
-    if (_userInfo) {
-        NSLog(@"User info count: %lu", (unsigned long)[_userInfo count]);
+    if (self.userInfo) {
+        NSLog(@"User info count: %lu", (unsigned long)[self.userInfo count]);
     }
 }
 

@@ -145,11 +145,13 @@ NSString *RefreshToken;
 - (void)loginWithFacebookID:(NSString *)fbToken
 {
     NSDictionary *paramDict = @{@"client_id": ClientID, @"client_secrect": ClientSecret, @"grant_type": @"assertion", @"assertion": fbToken};
+    
     [self sendPostRequestForEndpoint:kOAuthEndpoint withParameters:paramDict completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         if (!error) {
             NSHTTPURLResponse *responseH = (NSHTTPURLResponse *)response;
             
             if (responseH.statusCode == 200) {
+                self.isLoggedIn = YES;
                 self.authTokens = (NSDictionary *)responseItem;
                 NSLog(@"auth tokens: %@", self.authTokens);
                 NSLog(@"fb token: %@", fbToken);
@@ -160,7 +162,7 @@ NSString *RefreshToken;
                 if (expiresIn < 1200) {
                     AccessToken = [self.authTokens objectForKey:@"access_token"];
                     RefreshToken = [self.authTokens objectForKey:@"refresh_token"];
-                    [self refreshAccessToken];
+                    [self performSelectorOnMainThread:@selector(refreshAccessToken) withObject:nil waitUntilDone:YES];
                 } else {
                     AccessToken = [self.authTokens objectForKey:@"access_token"];
                     RefreshToken = [self.authTokens objectForKey:@"refresh_token"];
@@ -349,6 +351,7 @@ NSString *RefreshToken;
             NSDictionary *temp = (NSDictionary *)responseItem;
             
             if (httpResponse.statusCode == 200) {
+                NSLog(@"Resetting the tokens");
                 AccessToken = [temp objectForKey:@"access_token"];
                 RefreshToken = [temp objectForKey:@"refresh_token"];
             }
