@@ -62,6 +62,9 @@ BOOL isAuth;
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    
+    /*
     CLAuthorizationStatus locationServices = [CLLocationManager locationServicesEnabled];
     CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
     
@@ -136,6 +139,7 @@ BOOL isAuth;
         self.navigationItem.rightBarButtonItem.enabled = NO;
         isAuth = NO;
     }
+     */
     
 }
 
@@ -164,6 +168,7 @@ BOOL isAuth;
 {
     [super viewWillAppear:animated];
     
+    NSLog(@"View will appear...");
     if (isAuth) {
         [self fetchRooms];
     }
@@ -305,6 +310,85 @@ BOOL isAuth;
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
     NSLog(@"Auth status did change: %d", status);
+    
+    CLAuthorizationStatus locationServices = [CLLocationManager locationServicesEnabled];
+    
+    UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    
+    messageLabel.textColor = [UIColor blackColor];
+    messageLabel.numberOfLines = 0;
+    messageLabel.textAlignment = NSTextAlignmentCenter;
+    messageLabel.font = [UIFont systemFontOfSize:25];
+    [messageLabel sizeToFit];
+    
+    if (locationServices) {
+        if (status == kCLAuthorizationStatusNotDetermined) {
+            if (IS_IOS_8_OR_LATER) {
+                NSLog(@"Starting location services on iOS 8...");
+                [self.locationManager requestAlwaysAuthorization];
+                [self.locationManager startUpdatingLocation];
+                NSLog(@"Most recent location: %@", [self.locationManager location]);
+                
+                self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+                isAuth = YES;
+                [self fetchRooms];
+            } else {
+                NSLog(@"Starting location services...");
+                [_locationManager startUpdatingLocation];
+                self.navigationItem.leftBarButtonItem.enabled = YES;
+                self.navigationItem.rightBarButtonItem.enabled = YES;
+                isAuth = YES;
+                [self fetchRooms];
+            }
+        } else if (status == kCLAuthorizationStatusRestricted) {
+            NSLog(@"Status restricted...");
+            [self showAlertViewWithTitle:@"Whoa there" message:@"It looks like Location Services are currently restricted on your device. Come back later when they are unrestricted." cancelButton:@"Okay..."];
+            
+            messageLabel.text = @"Location Services are currently restricted. Cannot update chat rooms.";
+            self.tableView.backgroundView = messageLabel;
+            self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            
+            self.navigationItem.leftBarButtonItem.enabled = NO;
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+            isAuth = NO;
+            [self makeTableViewBlank];
+            
+        } else if (status == kCLAuthorizationStatusDenied) {
+            NSLog(@"Status denied...");
+            [self showAlertViewWithTitle:@"Sorry" message:@"In order to use GeoChat, we must be able to use your location to find chat rooms nearby. Please re-enable GeoChat for Location Services." cancelButton:@"Got it!"];
+            
+            messageLabel.text = @"Location services are 'off' for GeoChat";
+            self.tableView.backgroundView = messageLabel;
+            self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            
+            self.navigationItem.leftBarButtonItem.enabled = NO;
+            self.navigationItem.rightBarButtonItem.enabled = NO;
+            isAuth = NO;
+            [self makeTableViewBlank];
+        } else {
+            NSLog(@"Already authorized...");
+            
+            [self.locationManager startUpdatingLocation];
+            self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+            self.navigationItem.leftBarButtonItem.enabled = YES;
+            self.navigationItem.rightBarButtonItem.enabled = YES;
+            isAuth = YES;
+            //[self performSelectorInBackground:@selector(fetchRooms) withObject:self.roomItems];
+            [self fetchRooms];
+        }
+    } else {
+        NSLog(@"Status location services off");
+        [self showAlertViewWithTitle:@"Sorry about this!" message:@"It looks like you have Location Services disabled. GeoChat requires the use of your location to find the nearest chat rooms. Please enable your Location Services if you wish to use our service." cancelButton:@"Got it!"];
+        
+        messageLabel.text = @"Please re-enable Location Services in order to use GeoChat.";
+        self.tableView.backgroundView = messageLabel;
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        
+        self.navigationItem.leftBarButtonItem.enabled = NO;
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+        isAuth = NO;
+        [self makeTableViewBlank];
+    }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -313,6 +397,12 @@ BOOL isAuth;
     NSLog(@"Gathering location: %@", location);
     
     [manager stopUpdatingLocation];
+}
+
+- (void)makeTableViewBlank
+{
+    self.roomItems = nil;
+    [self.tableView reloadData];
 }
 
 @end

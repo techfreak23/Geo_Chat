@@ -90,7 +90,7 @@
         case 2: {
             NSLog(@"Facebook ID cell");
             
-            NSURL *facebookURL = [NSURL URLWithString:[NSString stringWithFormat:@"fb://profile/%@", self.currentUser.fbID]];
+            NSURL *facebookURL = [NSURL URLWithString:[NSString stringWithFormat:@"fb://profile?app_scoped_user=%@", self.currentUser.fbID]];
             if ([[UIApplication sharedApplication] canOpenURL:facebookURL]) {
                 [[UIApplication sharedApplication] openURL:facebookURL];
             } else {
