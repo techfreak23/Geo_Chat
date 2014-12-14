@@ -45,6 +45,8 @@
     
     self.messages = [self.roomInfo objectForKey:@"messages"];
     
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
+    
     [self createJSQMessages];
 }
 

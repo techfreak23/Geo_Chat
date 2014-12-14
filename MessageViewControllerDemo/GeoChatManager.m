@@ -15,10 +15,13 @@
 #define kRefreshTokenIdentifier @"refreshToken"
 #define kExpirationTokenIdentifier @"expireToken"
 
-#define kBgQueue dispatch_queue_create("com.MosRedRocket.geochatmanager.bgqueue", NULL)
+//#define kBgQueue dispatch_queue_create("com.MosRedRocket.geochatmanager.bgqueue", NULL)
+
+
 
 #import "GeoChatManager.h"
 #import "UYLPasswordManager.h"
+#import "dispatch/dispatch.h"
 
 @interface GeoChatManager() <NSURLSessionDataDelegate>
 
@@ -35,6 +38,7 @@ static const NSString *ClientID = @"107d5e7228ae2c1c911a4ff910ceda2a05fca50ff951
 static const NSString *ClientSecret = @"06dcef77d5ff607b7efae20f406b2667f8341e375819182870192a43c6461d16";
 NSString *AccessToken;
 NSString *RefreshToken;
+dispatch_queue_t kBgQueue;
 
 @implementation GeoChatManager
 
@@ -61,6 +65,7 @@ NSString *RefreshToken;
         NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
         _urlSession = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
         _manager = [UYLPasswordManager sharedInstance];
+        kBgQueue = dispatch_queue_create("com.MosRedRocket.GeoChatManager.bgqueue", NULL);
     }
     
     return self;
@@ -176,6 +181,7 @@ NSString *RefreshToken;
                 
             } else if (responseH.statusCode == 401) {
                 NSLog(@"Not authorized...");
+                [self refreshAccessToken];
             }
         }
     }];
