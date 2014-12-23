@@ -6,6 +6,11 @@
 //  Copyright (c) 2014 Art Sevilla. All rights reserved.
 //
 
+//#define kOAuthEndpoint @"http://10.0.0.31:3000/oauth/token"
+//#define kChatRoomsEndpoint @"http://10.0.0.31:3000/api/v1/chat_rooms"
+//#define kChatRoomEndpoint @"http://10.0.0.31:3000/api/v1/chat_room"
+//#define kUserEndpoint @"http://10.0.0.31:3000/api/v1/user"
+
 #define kOAuthEndpoint @"https://geochat-v1.herokuapp.com/oauth/token"
 #define kChatRoomsEndpoint @"https://geochat-v1.herokuapp.com/api/v1/chat_rooms"
 #define kChatRoomEndpoint @"https://geochat-v1.herokuapp.com/api/v1/chat_room"
@@ -28,6 +33,7 @@
 @property (nonatomic, strong) NSDictionary *authTokens;
 @property (nonatomic, strong) NSURLSession *urlSession;
 @property (nonatomic, strong) NSMutableArray *roomList;
+@property (nonatomic, strong) NSMutableArray *joinedRooms;
 @property (nonatomic, strong) NSString *accessToken;
 @property (nonatomic, strong) NSString *refreshToken;
 @property (nonatomic, strong) UYLPasswordManager *manager;
@@ -74,6 +80,7 @@ dispatch_queue_t kBgQueue;
 //sending the GET request
 - (void)sendGetRequestForEndpoint:(NSString *)urlString completion:(RequestCompletion)handler
 {
+    [self.delegate didBeginLoading];
     NSURL *getURL = [NSURL URLWithString:urlString];
     
     dispatch_async(kBgQueue, ^ {
@@ -95,7 +102,7 @@ dispatch_queue_t kBgQueue;
 //sending the POST request
 - (void)sendPostRequestForEndpoint:(NSString *)urlString withParameters:(NSDictionary *)params completion:(RequestCompletion)handler
 {
-    
+    [self.delegate didBeginLoading];
     NSLog(@"Post params: %@", params);
     NSURL *postURL = [NSURL URLWithString:urlString];
     
@@ -167,15 +174,18 @@ dispatch_queue_t kBgQueue;
                 if (expiresIn < 1200) {
                     AccessToken = [self.authTokens objectForKey:@"access_token"];
                     RefreshToken = [self.authTokens objectForKey:@"refresh_token"];
-                    [self performSelectorOnMainThread:@selector(refreshAccessToken) withObject:nil waitUntilDone:YES];
+                    [self refreshAccessToken];
+                    //[self performSelectorOnMainThread:@selector(refreshAccessToken) withObject:nil waitUntilDone:YES];
                 } else {
                     AccessToken = [self.authTokens objectForKey:@"access_token"];
                     RefreshToken = [self.authTokens objectForKey:@"refresh_token"];
                 }
                 
                 [self fetchCurrentUser];
+                [self fetchRoomsForUser];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSLog(@"Should be sending notification...");
+                    [self.delegate didFinishLoading];
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishLoggingIn" object:nil];
                 });
                 
@@ -192,13 +202,34 @@ dispatch_queue_t kBgQueue;
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
     [self sendGetRequestForEndpoint:[self stringForCurrentUser] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
-        NSLog(@"User item: %@", responseItem);
+        //NSLog(@"User item: %@", responseItem);
         GeoChatUser *newUser = [[GeoChatUser alloc] init];
         [newUser configureUserForDictionary:(NSMutableDictionary *)responseItem];
         self.currentUser = newUser;
         NSLog(@"Current user: %@", self.
               currentUser);
     }];
+}
+
+- (void)fetchRoomsForUser
+{
+    [self sendGetRequestForEndpoint:[self stringForUserRooms] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
+        if (!error) {
+            dispatch_async(dispatch_get_main_queue(), ^ {
+                self.joinedRooms = [NSMutableArray arrayWithArray:responseItem];
+            });
+        }
+    }];
+}
+
+- (NSMutableArray *)joinedRooms
+{
+    return _joinedRooms;
+}
+
+- (NSString *)stringForUserRooms
+{
+    return [NSString stringWithFormat:@"%@/chat_rooms?access_token=%@", kUserEndpoint, AccessToken];
 }
 
 //generates url string for current user
@@ -220,6 +251,7 @@ dispatch_queue_t kBgQueue;
                     NSLog(@"Good response");
                     
                     dispatch_async(dispatch_get_main_queue(), ^ {
+                        [self.delegate didFinishLoading];
                         [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithObject" object:responseItem];
                     });
                 } else if (httpResponse.statusCode == 401) {
@@ -248,6 +280,7 @@ dispatch_queue_t kBgQueue;
         if (!error) {
             NSLog(@"Should be posting notification...");
             dispatch_async(dispatch_get_main_queue(), ^ {
+                [self.delegate didFinishLoading];
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishCreatingRoom" object:responseItem];
             });
         }
@@ -259,6 +292,7 @@ dispatch_queue_t kBgQueue;
 {
     [self sendGetRequestForEndpoint:[self stringForRoomID:roomID] completion:^(id responseItem, NSURLResponse *response, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^ {
+            [self.delegate didFinishLoading];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithRoomInfo" object:responseItem];
         });
     }];
@@ -282,6 +316,7 @@ dispatch_queue_t kBgQueue;
             if (httpResponse.statusCode == 201) {
                 dispatch_async(dispatch_get_main_queue(), ^ {
                     NSLog(@"should be sending message here...");
+                    [self.delegate didFinishLoading];
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingWithSuccess" object:responseItem];
                 });
             } else if (httpResponse.statusCode == 500) {
@@ -301,6 +336,7 @@ dispatch_queue_t kBgQueue;
             NSMutableArray *temp = (NSMutableArray *)responseItem;
             
             dispatch_async(dispatch_get_main_queue(), ^ {
+                [self.delegate didFinishLoading];
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithNewMessages" object:temp];
             });
         } else {

@@ -89,12 +89,14 @@ BOOL isAuth;
     
     NSLog(@"View will appear...");
     if (isAuth) {
+        NSLog(@"Is auth");
         [self fetchRooms];
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRequestWithItem:) name:@"didFinishWithObject" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishWithRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishAddingToRoom:) name:@"didFinishAddingToRoom" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishUserRooms:) name:@"didFinishUserRooms" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingRoom" object:nil];
 }
 
@@ -107,6 +109,11 @@ BOOL isAuth;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableData:) name:@"didFinishAddingRoom" object:nil];
 }
 
+- (void)didFinishUserRooms:(NSNotification *)notification
+{
+    NSLog(@"Did finish with user rooms.");
+}
+
 - (void)didFinishRequestWithItem:(NSNotification *)notification
 {
     self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
@@ -114,6 +121,7 @@ BOOL isAuth;
     [self.indicatorView stopAnimating];
     self.tableView.scrollEnabled = YES;
     [self stopRefresh];
+    self.joinedRooms = [[GeoChatManager sharedManager] joinedRooms];
    [self.tableView reloadData];
 }
 
@@ -206,8 +214,36 @@ BOOL isAuth;
     NSLog(@"Did select row: %@", [self.roomItems objectAtIndex:indexPath.row]);
     
     NSDictionary *temp = (NSDictionary *)[self.roomItems objectAtIndex:indexPath.row];
-    [[GeoChatManager sharedManager] addUserToRoom:[temp objectForKey:@"id"]];
-    //[[GeoChatManager sharedManager] fetchRoomForID:[temp objectForKey:@"id"]];
+    NSString *roomID = (NSString *)[temp objectForKey:@"id"];
+    NSLog(@"Room id: %@", roomID);
+    
+    BOOL isInRoom = NO;
+    
+    if (!self.joinedRooms) {
+        NSLog(@"Something about this timing is off...");
+    } else {
+        NSLog(@"We all good on the room list...");
+        for (NSDictionary *tempDict in self.joinedRooms) {
+            NSString *joinedRoomID = (NSString *)[tempDict objectForKey:@"id"];
+            NSLog(@"Joined room ID: %@", joinedRoomID);
+            
+            if ([roomID intValue] == [joinedRoomID intValue]) {
+                //NSLog(@"User is already in the room. Just fetch the room info...");
+                isInRoom = YES;
+            }
+        }
+        
+    }
+    if (isInRoom) {
+        NSLog(@"User is already in room. Fetch room details.");
+        [[GeoChatManager sharedManager] fetchRoomForID:roomID];
+    } else {
+        NSLog(@"User is not in room. Add, then fetch room info.");
+        [[GeoChatManager sharedManager] addUserToRoom:roomID];
+    }
+    
+    
+    
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -258,7 +294,7 @@ BOOL isAuth;
                 [self.indicatorView startAnimating];
                 
                 isAuth = YES;
-                [self fetchRooms];
+                //[self fetchRooms];
             }
         } else if (status == kCLAuthorizationStatusRestricted) {
             NSLog(@"Status restricted...");
@@ -297,7 +333,7 @@ BOOL isAuth;
             [self.view addSubview:self.indicatorView];
             [self.indicatorView startAnimating];
             
-            [self fetchRooms];
+            //[self fetchRooms];
         }
     } else {
         NSLog(@"Status location services off");
@@ -319,7 +355,13 @@ BOOL isAuth;
     CLLocation *location = [locations objectAtIndex:0];
     NSLog(@"Gathering location: %@", location);
     
-    [manager stopUpdatingLocation];
+    CLLocationAccuracy accuracy = location.horizontalAccuracy;
+    
+    if (accuracy) {
+        NSLog(@"The location manager has the needed accuracy...");
+        [manager stopUpdatingLocation];
+        [self fetchRooms];
+    }
 }
 
 - (void)makeTableViewBlank

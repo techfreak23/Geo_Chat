@@ -245,8 +245,29 @@
     NSLog(@"%s: %@", __PRETTY_FUNCTION__, userLocation);
     CLLocationAccuracy accuracy = userLocation.location.horizontalAccuracy;
     if (accuracy) {
+        NSLog(@"We have our accuracy...");
         [self updateLocation];
     }
+}
+
+- (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
+- (void)mapViewWillStartLoadingMap:(MKMapView *)mapView
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
+- (void)mapViewWillStartRenderingMap:(MKMapView *)mapView
+{
+    NSLog(@"%s", __PRETTY_FUNCTION__);
+}
+
+- (void)mapViewDidStopLocatingUser:(MKMapView *)mapView
+{
+    NSLog(@"No longer locating the user...");
 }
 
 #pragma mark - text field delegate methods

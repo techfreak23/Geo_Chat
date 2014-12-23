@@ -24,10 +24,16 @@ BOOL loggedIn = NO;
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
+    NSLog(@"Launch options: %@", launchOptions);
+    
     // Override point for customization after application launch.
     [FBLoginView class];
     [MasterViewController class];
     [LoginViewController class];
+    
+    UIUserNotificationSettings *notifSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound) categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
     
     UIViewController *controller;
     
@@ -128,6 +134,21 @@ BOOL loggedIn = NO;
 - (void)setLoginStatus:(BOOL)loginStatus
 {
     loggedIn = loginStatus;
+}
+
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSLog(@"My token is: %@", deviceToken);
+}
+
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+    NSLog(@"Failed to get token, error: %@", error.description);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    NSLog(@"Received notification: %@", userInfo);
 }
 
 @end

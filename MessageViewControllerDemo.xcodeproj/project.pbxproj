@@ -233,6 +233,7 @@
 		048CF7471A2D9565004E20BE /* GeoChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatManager.m; sourceTree = "<group>"; };
 		048CF7481A2D9565004E20BE /* GeoChatUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeoChatUser.h; sourceTree = "<group>"; };
 		048CF7491A2D9565004E20BE /* GeoChatUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatUser.m; sourceTree = "<group>"; };
+		962DFA1D1A42E8FD0024D288 /* GeoChatProfile.mobileprovision */ = {isa = PBXFileReference; lastKnownFileType = file; path = GeoChatProfile.mobileprovision; sourceTree = "<group>"; };
 		965108481A3945DA00AACBFE /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -448,6 +449,7 @@
 		042440D01A2BE089004B0786 = {
 			isa = PBXGroup;
 			children = (
+				962DFA1D1A42E8FD0024D288 /* GeoChatProfile.mobileprovision */,
 				042440DB1A2BE089004B0786 /* MessageViewControllerDemo */,
 				042440F51A2BE089004B0786 /* MessageViewControllerDemoTests */,
 				042440DA1A2BE089004B0786 /* Products */,
