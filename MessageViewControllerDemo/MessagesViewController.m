@@ -7,6 +7,7 @@
 //
 
 #import "MessagesViewController.h"
+#import "UserListViewController.h"
 
 
 @interface MessagesViewController () <UIAlertViewDelegate, UIActionSheetDelegate>
@@ -21,13 +22,10 @@
 
 - (void)viewDidLoad
 {
-    NSLog(@"Messages view loading...");
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.title = [self.roomInfo objectForKey:@"name"];
     
-    //self.collectionView.collectionViewLayout.springinessEnabled = YES;
-    //self.collectionView.collectionViewLayout.springResistanceFactor = 9000;
+    self.title = [self.roomInfo objectForKey:@"name"];
     
     self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
     self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
@@ -36,7 +34,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishSendingWithSuccess:) name:@"didFinishSendingWithSuccess" object:nil];
     
     self.currentUser = [GeoChatManager sharedManager].currentUser;
-    NSLog(@"Current user: %@", self.currentUser);
     self.senderId = (NSString *)self.currentUser.userID;
     self.senderDisplayName = (NSString *)self.currentUser.nickname;
     self.showLoadEarlierMessagesHeader = NO;
@@ -46,6 +43,7 @@
     self.messages = [self.roomInfo objectForKey:@"messages"];
     
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actions-ellipse"] style:UIBarButtonItemStylePlain target:self action:@selector(showOptions)];
     
     [self createJSQMessages];
 }
@@ -63,15 +61,21 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (void)showOptions
+{
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Show current users", @"Leave room", nil];
+    actionSheet.tag = 23;
+    [actionSheet showInView:self.view];
+}
+
 - (void)createJSQMessages
 {
     if (!self.jsqMessages) {
         NSLog(@"Initializing JSQ messages...");
         self.jsqMessages = [[NSMutableArray alloc] init];
+        
         if (self.messages) {
-            NSLog(@"Messages does exist...");
             for (NSDictionary *tempDict in self.messages) {
-                NSLog(@"Temp dict: %@", tempDict);
                 JSQMessage *message = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [tempDict objectForKey:@"user_id"]] senderDisplayName:[tempDict objectForKey:@"user_name"] date:[tempDict objectForKey:@"time"] text:[tempDict objectForKey:@"content"]];
                 [self.jsqMessages addObject:message];
         }
@@ -93,29 +97,22 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     return self.jsqMessages.count;
 }
 
 - (id<JSQMessageData>)collectionView:(JSQMessagesCollectionView *)collectionView messageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     return [self.jsqMessages objectAtIndex:indexPath.item];
 }
 
 - (id<JSQMessageBubbleImageDataSource>)collectionView:(JSQMessagesCollectionView *)collectionView messageBubbleImageDataForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
     JSQMessagesBubbleImageFactory *bubbleFactory = [[JSQMessagesBubbleImageFactory alloc] init];
     JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
-    NSLog(@"message id: %@\nmy id: %@", message.senderId, self.senderId);
-    
     if ([message.senderId intValue] == [self.senderId intValue]) {
-        NSLog(@"YESSIR it outgoing");
         return [bubbleFactory outgoingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleBlueColor]];
     } else {
-        NSLog(@"NOOOOSIR it's incoming");
         return [bubbleFactory incomingMessagesBubbleImageWithColor:[UIColor jsq_messageBubbleLightGrayColor]];
     }
 
@@ -141,7 +138,7 @@
 
 - (NSAttributedString *)collectionView:(JSQMessagesCollectionView *)collectionView attributedTextForMessageBubbleTopLabelAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    //NSLog(@"%s", __PRETTY_FUNCTION__);
     JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
     if ([message.senderId intValue] == [self.senderId intValue]) {
@@ -163,8 +160,6 @@
     //NSLog(@"%s", __PRETTY_FUNCTION__);
     JSQMessagesCollectionViewCell *cell = (JSQMessagesCollectionViewCell *)[super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
-    //CGRect frame = [[UIScreen mainScreen] bounds];
-    
     JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
     
     NSLog(@"Message at index path %ld message: %@", (long)indexPath.item, message);
@@ -174,8 +169,7 @@
     } else {
         cell.textView.textColor = [UIColor blackColor];
     }
-    //frame.size.height = cell.frame.size.height;
-    //cell.frame = frame;
+    
     cell.textView.linkTextAttributes = @{ NSForegroundColorAttributeName : cell.textView.textColor,
                                           NSUnderlineStyleAttributeName : @(NSUnderlineStyleSingle | NSUnderlinePatternSolid) };
     
@@ -240,21 +234,46 @@
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    switch (buttonIndex) {
-        case 0:
-            NSLog(@"Button index 0");
-            break;
-            
-        case 1:
-            NSLog(@"Button index 1");
-            break;
-            
-        case 2:
-            NSLog(@"Button index 2");
-            
-        default:
-            break;
+    if (actionSheet.tag == 23) {
+        switch (buttonIndex) {
+            case 0: {
+                NSLog(@"Button 0 pressed...");
+                
+                UserListViewController *controller = [[UserListViewController alloc] initWithNibName:@"UserListViewController" bundle:nil];
+                controller.userList = [self.roomInfo objectForKey:@"users"];
+                [self.navigationController pushViewController:controller animated:YES];
+            }
+                break;
+                
+            case 1:
+                NSLog(@"Button 1 pressed...");
+                break;
+                
+            case 2:
+                NSLog(@"Button 2 pressed...");
+                break;
+                
+            default:
+                break;
+        }
+    } else {
+        switch (buttonIndex) {
+            case 0:
+                NSLog(@"Button index 0");
+                break;
+                
+            case 1:
+                NSLog(@"Button index 1");
+                break;
+                
+            case 2:
+                NSLog(@"Button index 2");
+                
+            default:
+                break;
+        }
     }
+    
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex

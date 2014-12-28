@@ -51,10 +51,11 @@ BOOL isAuth;
     self.refreshControl = refresh;
     
     self.tableView.scrollEnabled = NO;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     CGRect frame = [[UIScreen mainScreen] bounds];
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(frame.size.width/2, frame.size.height/2, 200.0, 200.0)];
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 50, frame.size.height/2 - 50, 200.0, 200.0)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     
     self.locationManager = [[CLLocationManager alloc] init];

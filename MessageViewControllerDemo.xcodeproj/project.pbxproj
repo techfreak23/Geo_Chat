@@ -77,6 +77,11 @@
 		048CF74A1A2D9565004E20BE /* GeoChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7471A2D9565004E20BE /* GeoChatManager.m */; };
 		048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7491A2D9565004E20BE /* GeoChatUser.m */; };
 		965108491A3945DA00AACBFE /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965108481A3945DA00AACBFE /* FacebookSDK.framework */; };
+		968310B31A4B6BEF006C5428 /* actions-ellipse@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */; };
+		968310B41A4B6BEF006C5428 /* actions-ellipse@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 968310B11A4B6BEF006C5428 /* actions-ellipse@3x.png */; };
+		968310B51A4B6BEF006C5428 /* actions-ellipse.png in Resources */ = {isa = PBXBuildFile; fileRef = 968310B21A4B6BEF006C5428 /* actions-ellipse.png */; };
+		96AD7C131A4F75460019AF96 /* UserListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96AD7C111A4F75460019AF96 /* UserListViewController.m */; };
+		96AD7C141A4F75460019AF96 /* UserListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96AD7C121A4F75460019AF96 /* UserListViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -235,6 +240,12 @@
 		048CF7491A2D9565004E20BE /* GeoChatUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatUser.m; sourceTree = "<group>"; };
 		962DFA1D1A42E8FD0024D288 /* GeoChatProfile.mobileprovision */ = {isa = PBXFileReference; lastKnownFileType = file; path = GeoChatProfile.mobileprovision; sourceTree = "<group>"; };
 		965108481A3945DA00AACBFE /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
+		968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "actions-ellipse@2x.png"; sourceTree = "<group>"; };
+		968310B11A4B6BEF006C5428 /* actions-ellipse@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "actions-ellipse@3x.png"; sourceTree = "<group>"; };
+		968310B21A4B6BEF006C5428 /* actions-ellipse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "actions-ellipse.png"; sourceTree = "<group>"; };
+		96AD7C101A4F75460019AF96 /* UserListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserListViewController.h; sourceTree = "<group>"; };
+		96AD7C111A4F75460019AF96 /* UserListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserListViewController.m; sourceTree = "<group>"; };
+		96AD7C121A4F75460019AF96 /* UserListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserListViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -450,6 +461,9 @@
 			isa = PBXGroup;
 			children = (
 				962DFA1D1A42E8FD0024D288 /* GeoChatProfile.mobileprovision */,
+				968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */,
+				968310B11A4B6BEF006C5428 /* actions-ellipse@3x.png */,
+				968310B21A4B6BEF006C5428 /* actions-ellipse.png */,
 				042440DB1A2BE089004B0786 /* MessageViewControllerDemo */,
 				042440F51A2BE089004B0786 /* MessageViewControllerDemoTests */,
 				042440DA1A2BE089004B0786 /* Products */,
@@ -479,6 +493,9 @@
 				0424410A1A2C0DBB004B0786 /* MasterViewController.xib */,
 				0421F2C51A30544500FCAB04 /* MessagesViewController.h */,
 				0421F2C61A30544500FCAB04 /* MessagesViewController.m */,
+				96AD7C101A4F75460019AF96 /* UserListViewController.h */,
+				96AD7C111A4F75460019AF96 /* UserListViewController.m */,
+				96AD7C121A4F75460019AF96 /* UserListViewController.xib */,
 				0424410D1A2C0E00004B0786 /* LoginViewController.h */,
 				0424410E1A2C0E00004B0786 /* LoginViewController.m */,
 				0424410F1A2C0E00004B0786 /* LoginViewController.xib */,
@@ -655,11 +672,15 @@
 				042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */,
 				042440ED1A2BE089004B0786 /* LaunchScreen.xib in Resources */,
 				042440EA1A2BE089004B0786 /* Images.xcassets in Resources */,
+				96AD7C141A4F75460019AF96 /* UserListViewController.xib in Resources */,
 				0421F2931A3052D200FCAB04 /* JSQMessages.strings in Resources */,
 				0421F2B01A3052D200FCAB04 /* JSQMessagesCollectionViewCellIncoming.xib in Resources */,
 				0424410C1A2C0DBB004B0786 /* MasterViewController.xib in Resources */,
+				968310B41A4B6BEF006C5428 /* actions-ellipse@3x.png in Resources */,
+				968310B51A4B6BEF006C5428 /* actions-ellipse.png in Resources */,
 				0421F29C1A3052D200FCAB04 /* JSQMessagesViewController.xib in Resources */,
 				0421F2BA1A3052D200FCAB04 /* JSQMessagesToolbarContentView.xib in Resources */,
+				968310B31A4B6BEF006C5428 /* actions-ellipse@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,6 +730,7 @@
 				0421F2B11A3052D200FCAB04 /* JSQMessagesCollectionViewCellOutgoing.m in Sources */,
 				0421F2981A3052D200FCAB04 /* UIImage+JSQMessages.m in Sources */,
 				0421F29E1A3052D200FCAB04 /* JSQMessagesBubbleImageFactory.m in Sources */,
+				96AD7C131A4F75460019AF96 /* UserListViewController.m in Sources */,
 				0421F2AF1A3052D200FCAB04 /* JSQMessagesCollectionViewCellIncoming.m in Sources */,
 				0421F2941A3052D200FCAB04 /* JSQSystemSoundPlayer+JSQMessages.m in Sources */,
 				0421F2B61A3052D200FCAB04 /* JSQMessagesLoadEarlierHeaderView.m in Sources */,

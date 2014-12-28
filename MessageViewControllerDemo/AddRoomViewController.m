@@ -40,6 +40,7 @@
     self.navigationItem.rightBarButtonItem.enabled = NO;
     
     self.tableView.scrollEnabled = NO;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 }
 
 - (void)didReceiveMemoryWarning
