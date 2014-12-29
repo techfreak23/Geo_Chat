@@ -17,12 +17,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    self.title = @"Profile";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(closeView)];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)closeView
+{
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Table view data source

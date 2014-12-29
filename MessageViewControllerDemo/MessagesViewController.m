@@ -63,7 +63,7 @@
 
 - (void)showOptions
 {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Show current users", @"Leave room", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Show current users", @"Show room details", @"Leave room", nil];
     actionSheet.tag = 23;
     [actionSheet showInView:self.view];
 }
@@ -215,7 +215,7 @@
     NSLog(@"Tapped cell at %@!", NSStringFromCGPoint(touchLocation));
 }
 
-#pragma mark - messages view delegate methods
+#pragma mark - messages view delegate
 
 - (void)didPressSendButton:(UIButton *)button withMessageText:(NSString *)text senderId:(NSString *)senderId senderDisplayName:(NSString *)senderDisplayName date:(NSDate *)date
 {
@@ -230,14 +230,14 @@
 }
 
 
-#pragma mark - action sheet delegate methods
+#pragma mark - action sheet delegate
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if (actionSheet.tag == 23) {
         switch (buttonIndex) {
             case 0: {
-                NSLog(@"Button 0 pressed...");
+                NSLog(@"User wants to see the other users");
                 
                 UserListViewController *controller = [[UserListViewController alloc] initWithNibName:@"UserListViewController" bundle:nil];
                 controller.userList = [self.roomInfo objectForKey:@"users"];
@@ -246,39 +246,41 @@
                 break;
                 
             case 1:
-                NSLog(@"Button 1 pressed...");
+                NSLog(@"User wants to see the deets");
                 break;
                 
-            case 2:
-                NSLog(@"Button 2 pressed...");
+            case 2: {
+                NSLog(@"User wants to leave the room :(");
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Leave Room?" message:@"Are you sure you want to leave this room?" delegate:self cancelButtonTitle:@"Never mind" otherButtonTitles:@"Yes", nil];
+                [alert show];
+            }
                 break;
                 
-            default:
-                break;
-        }
-    } else {
-        switch (buttonIndex) {
-            case 0:
-                NSLog(@"Button index 0");
-                break;
-                
-            case 1:
-                NSLog(@"Button index 1");
-                break;
-                
-            case 2:
-                NSLog(@"Button index 2");
+            case 3:
+                NSLog(@"User is cancelling");
                 
             default:
                 break;
         }
     }
-    
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+#pragma mark - Alert view delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    
+    switch (buttonIndex) {
+        case 0:
+            NSLog(@"This is the no button...");
+            break;
+            
+        case 1:
+            NSLog(@"Leaving room!");
+            break;
+            
+        default:
+            break;
+    }
 }
 
 @end

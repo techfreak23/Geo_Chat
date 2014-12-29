@@ -12,6 +12,7 @@
 #import "JSQMessages.h"
 #import "MasterViewController.h"
 #import "AddRoomViewController.h"
+#import "UserViewController.h"
 #import "SettingsViewController.h"
 #import "LoginViewController.h"
 #import "GeoChatManager.h"
@@ -21,7 +22,7 @@
 #define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 #define IS_IOS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 
-@interface MasterViewController () <CLLocationManagerDelegate>
+@interface MasterViewController () <CLLocationManagerDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *roomItems;
 @property (nonatomic, strong) NSMutableArray *joinedRooms;
@@ -43,7 +44,8 @@ BOOL isAuth;
     
     self.title = @"GeoChat!";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
+    //self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Settings" style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
@@ -61,27 +63,6 @@ BOOL isAuth;
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
     
-}
-
-- (void)stopRefresh
-{
-    [self.refreshControl endRefreshing];
-}
-
-- (void)fetchRooms
-{
-    NSLog(@"Fetching rooms...");
-    
-    CLLocation *location = self.locationManager.location;
-    NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
-    NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
-    [[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"50" radius:@"100"];
-}
-
-- (void)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton
-{
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:self cancelButtonTitle:cancelButton otherButtonTitles: nil];
-    [alert show];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -108,6 +89,69 @@ BOOL isAuth;
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingToRoom" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableData:) name:@"didFinishAddingRoom" object:nil];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - My methods
+
+- (void)showAlertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:self cancelButtonTitle:cancelButton otherButtonTitles: nil];
+    [alert show];
+}
+
+- (void)stopRefresh
+{
+    [self.refreshControl endRefreshing];
+}
+
+- (void)fetchRooms
+{
+    NSLog(@"Fetching rooms...");
+    
+    CLLocation *location = self.locationManager.location;
+    NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
+    NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
+    [[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"50" radius:@"100"];
+}
+
+- (void)addRoom
+{
+    NSLog(@"Adding room...");
+    AddRoomViewController *controller = [[AddRoomViewController alloc] initWithNibName:@"AddRoomViewController" bundle:nil];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+    [self.navigationController presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)viewSettings
+{
+    
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
+    [actionSheet showInView:self.view];
+}
+
+- (void)makeTableViewBlank
+{
+    self.roomItems = nil;
+    self.tableView.scrollEnabled = NO;
+    [self.tableView reloadData];
+}
+
+#pragma notification methods
+
+- (void)reloadTableData:(NSNotification *)notification
+{
+    NSLog(@"Should be reloading from notification: %@", [notification object]);
+    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+    [self.roomItems addObject:[notification object]];
+    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+    
+    [self fetchRooms];
 }
 
 - (void)didFinishUserRooms:(NSNotification *)notification
@@ -146,37 +190,7 @@ BOOL isAuth;
     [[GeoChatManager sharedManager] fetchRoomForID:[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"id"]];
 }
 
-- (void)reloadTableData:(NSNotification *)notification
-{
-    NSLog(@"Should be reloading from notification: %@", [notification object]);
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [self.roomItems addObject:[notification object]];
-    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    
-    [self fetchRooms];
-}
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)addRoom
-{
-    NSLog(@"Adding room...");
-    AddRoomViewController *controller = [[AddRoomViewController alloc] initWithNibName:@"AddRoomViewController" bundle:nil];
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    [self.navigationController presentViewController:navController animated:YES completion:nil];
-}
-
-- (void)viewSettings
-{
-    NSLog(@"View settings...");
-    SettingsViewController *controller = [[SettingsViewController alloc] initWithNibName:@"SettingsViewController" bundle:nil];
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    [self.navigationController presentViewController:navController animated:YES completion:nil];
-}
 
 #pragma mark - Table view data source
 
@@ -206,6 +220,16 @@ BOOL isAuth;
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %.2f", [[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"] floatValue]];
     
     return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 62.0f;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 62.0f;
 }
 
 #pragma mark - table view delegate methods
@@ -365,11 +389,50 @@ BOOL isAuth;
     }
 }
 
-- (void)makeTableViewBlank
+#pragma mark - action sheet delegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    self.roomItems = nil;
-    self.tableView.scrollEnabled = NO;
-    [self.tableView reloadData];
+    switch (buttonIndex) {
+        case 0:{
+            NSLog(@"Getting user info...");
+            UserViewController *controller = [[UserViewController alloc] init];
+            controller.currentUser = [[GeoChatManager sharedManager] currentUser];
+            
+            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+            
+            [self.navigationController presentViewController:navController animated:YES completion:nil];
+        }
+            break;
+            
+        case 1:{
+            NSLog(@"User wants to logout");
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Logout" message:@"Are you sure?" delegate:self cancelButtonTitle:@"Never mind" otherButtonTitles:@"Yes", nil];
+            [alert show];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+#pragma mark - alert view delegate
+
+- (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    switch (buttonIndex) {
+        case 0:
+            NSLog(@"Cancelling...?");
+            break;
+            
+        case 1:
+            NSLog(@"Logging out...");
+            break;
+            
+        default:
+            break;
+    }
 }
 
 @end
