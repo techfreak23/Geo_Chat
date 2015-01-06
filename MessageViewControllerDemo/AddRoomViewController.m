@@ -65,6 +65,7 @@
 - (void)createNewRoom
 {
     NSLog(@"Create room...");
+    [self.roomNameField resignFirstResponder];
     MKUserLocation *location = self.mapView.userLocation;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];

@@ -31,9 +31,9 @@ BOOL loggedIn = NO;
     [MasterViewController class];
     [LoginViewController class];
     
-    UIUserNotificationSettings *notifSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound) categories:nil];
-    [[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
-    [[UIApplication sharedApplication] registerForRemoteNotifications];
+    //UIUserNotificationSettings *notifSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound) categories:nil];
+    //[[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
+    //[[UIApplication sharedApplication] registerForRemoteNotifications];
     
     UIViewController *controller;
     

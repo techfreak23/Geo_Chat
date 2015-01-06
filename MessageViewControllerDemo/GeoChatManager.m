@@ -20,8 +20,6 @@
 #define kRefreshTokenIdentifier @"refreshToken"
 #define kExpirationTokenIdentifier @"expireToken"
 
-//#define kBgQueue dispatch_queue_create("com.MosRedRocket.geochatmanager.bgqueue", NULL)
-
 
 
 #import "GeoChatManager.h"
@@ -40,8 +38,8 @@
 
 @end
 
-static const NSString *ClientID = @"107d5e7228ae2c1c911a4ff910ceda2a05fca50ff951c271f6d3a7851f9bbdf5";
-static const NSString *ClientSecret = @"06dcef77d5ff607b7efae20f406b2667f8341e375819182870192a43c6461d16";
+static const NSString *ClientID = @"81fc0fd70219e5701f54982262b0f6b3c4bb6643a289581ae023bc85513e32e3";
+static const NSString *ClientSecret = @"87fa1dde258a6bea536840d98b1c8934d26790cbb0124c3a136f1da2f2a8803b";
 NSString *AccessToken;
 NSString *RefreshToken;
 dispatch_queue_t kBgQueue;
@@ -68,6 +66,7 @@ dispatch_queue_t kBgQueue;
     self = [super init];
     
     if (self) {
+        
         NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
         _urlSession = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
         _manager = [UYLPasswordManager sharedInstance];
@@ -85,9 +84,11 @@ dispatch_queue_t kBgQueue;
     
     dispatch_async(kBgQueue, ^ {
         NSURLSessionDataTask *dataTask = [self.urlSession dataTaskWithURL:getURL completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            
             if (!error) {
                 NSHTTPURLResponse *newResponse = (NSHTTPURLResponse *)response;
                 NSLog(@"Response code: %ld", (long)newResponse.statusCode);
+                
                 handler([self parseResponseData:data], response, nil);
                 
             } else {
@@ -134,6 +135,24 @@ dispatch_queue_t kBgQueue;
     } else {
         NSLog(@"There was an erroring converting the post params: %@", parseError.description);
         handler(nil, nil, parseError);
+    }
+}
+
+- (void)sendPatchRequestForUrl:(NSString *)urlString withParameters:(NSDictionary *)params completion:(RequestCompletion)handler
+{
+    NSURL *patchURL = [NSURL URLWithString:urlString];
+    NSError *parseError;
+    NSData *data = [NSJSONSerialization dataWithJSONObject:params options:0 error:&parseError];
+    
+    if (!parseError) {
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:patchURL];
+        [request setValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        [request setHTTPMethod:@"PATCH"];
+        [request setHTTPBody:data];
+        
+        dispatch_async(kBgQueue, ^ {
+            
+        });
     }
 }
 
