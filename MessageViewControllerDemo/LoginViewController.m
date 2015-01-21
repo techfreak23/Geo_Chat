@@ -11,6 +11,7 @@
 #import "MasterViewController.h"
 #import "UYLPasswordManager.h"
 #import "GeoChatManager.h"
+#import "GeoChatAPIManager.h"
 
 #define kFacebookTokenIdentifier @"facebookToken"
 
@@ -35,8 +36,8 @@
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
     // Do any additional setup after loading the view from its nib.
-    _loginView.delegate = self;
-    _loginView.readPermissions = @[@"public_profile", @"email"];
+    self.loginView.delegate = self;
+    self.loginView.readPermissions = @[@"public_profile", @"email"];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -60,15 +61,9 @@
 - (void)loginViewFetchedUserInfo:(FBLoginView *)loginView user:(id<FBGraphUser>)user
 {
     NSLog(@"%s: %@", __PRETTY_FUNCTION__, user);
-    UYLPasswordManager *manager = [UYLPasswordManager sharedInstance];
     
-    if ([manager keyForIdentifier:kFacebookTokenIdentifier]) {
-        [manager deleteKeyForIdentifier:kFacebookTokenIdentifier];
-        [manager registerKey:[[[FBSession activeSession] accessTokenData] accessToken] forIdentifier:kFacebookTokenIdentifier];
-    } else {
-        [manager registerKey:[[[FBSession activeSession] accessTokenData] accessToken] forIdentifier:kFacebookTokenIdentifier];
-    }
-    [[GeoChatManager sharedManager] loginWithFacebookID:[[[FBSession activeSession] accessTokenData] accessToken]];
+    //[[GeoChatManager sharedManager] loginWithFacebookID:[[[FBSession activeSession] accessTokenData] accessToken]];
+    [[GeoChatAPIManager sharedManager] loginWithAssertion:[[[FBSession activeSession] accessTokenData] accessToken]];
 }
 
 - (void)loginViewShowingLoggedInUser:(FBLoginView *)loginView
@@ -79,8 +74,6 @@
 - (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    UYLPasswordManager *manager = [UYLPasswordManager sharedInstance];
-    [manager deleteKeyForIdentifier:kFacebookTokenIdentifier];
 }
 
 - (void)didFinishLoggingIn:(NSNotification *)notification

@@ -15,6 +15,7 @@
 #import "UserViewController.h"
 #import "SettingsViewController.h"
 #import "LoginViewController.h"
+#import "GeoChatAPIManager.h"
 #import "GeoChatManager.h"
 #import "MessagesViewController.h"
 
@@ -25,14 +26,12 @@
 @interface MasterViewController () <CLLocationManagerDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *roomItems;
-@property (nonatomic, strong) NSMutableArray *joinedRooms;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 
 @end
 
 static NSString *reuseIdentifier = @"Cell";
-BOOL isAuth;
 
 @implementation MasterViewController
 
@@ -61,33 +60,22 @@ BOOL isAuth;
     
     self.locationManager = [[CLLocationManager alloc] init];
     self.locationManager.delegate = self;
-    
+    self.locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters;
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRooms:) name:@"didFinishFetchingRooms" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishRoomInfo" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
     
-    NSLog(@"View will appear...");
-    if (isAuth) {
-        NSLog(@"Is auth");
-        [self fetchRooms];
-    }
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRequestWithItem:) name:@"didFinishWithObject" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishWithRoomInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishAddingToRoom:) name:@"didFinishAddingToRoom" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishUserRooms:) name:@"didFinishUserRooms" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingRoom" object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithObject" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishWithRoomInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishAddingToRoom" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableData:) name:@"didFinishAddingRoom" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -116,7 +104,8 @@ BOOL isAuth;
     CLLocation *location = self.locationManager.location;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
-    [[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"50" radius:@"100"];
+    //[[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"50" radius:@"100"];
+    [[GeoChatAPIManager sharedManager] fetchRoomsForLatitude:latitude longitude:longitude];
 }
 
 - (void)addRoom
@@ -143,53 +132,27 @@ BOOL isAuth;
 
 #pragma notification methods
 
-- (void)reloadTableData:(NSNotification *)notification
+- (void)didFinishWithRooms:(NSNotification *)notification
 {
-    NSLog(@"Should be reloading from notification: %@", [notification object]);
-    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [self.roomItems addObject:[notification object]];
-    [self.tableView insertRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    
-    [self fetchRooms];
-}
-
-- (void)didFinishUserRooms:(NSNotification *)notification
-{
-    NSLog(@"Did finish with user rooms.");
-}
-
-- (void)didFinishRequestWithItem:(NSNotification *)notification
-{
+    NSLog(@"Did finish with rooms notif...");
     self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     [self.indicatorView stopAnimating];
     self.tableView.scrollEnabled = YES;
     [self stopRefresh];
-    self.joinedRooms = [[GeoChatManager sharedManager] joinedRooms];
-   [self.tableView reloadData];
+    [self.tableView reloadData];
+
+}
+
+- (void)didFinishCreatingRoom:(NSNotification *)notification
+{
+    NSLog(@"Did finish creating room notif...");
 }
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
 {
-    NSLog(@"Notification from room received: %@", notification.description);
-    
-    MessagesViewController *controller = [[MessagesViewController alloc] init];
-    controller.roomInfo = (NSMutableDictionary *)[notification object];
-    NSLog(@"controller room info: %@", controller.roomInfo);
-    controller.currentUser = [[GeoChatManager sharedManager] currentUser];
-    
-    [self.navigationController pushViewController:controller animated:YES];
+    NSLog(@"Did finish room info notif...");
 }
-
-- (void)didFinishAddingToRoom:(NSNotification *)notification
-{
-    NSLog(@"We're all good here: %@", notification.description);
-    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-    
-    [[GeoChatManager sharedManager] fetchRoomForID:[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"id"]];
-}
-
-
 
 #pragma mark - Table view data source
 
@@ -242,33 +205,7 @@ BOOL isAuth;
     NSString *roomID = (NSString *)[temp objectForKey:@"id"];
     NSLog(@"Room id: %@", roomID);
     
-    BOOL isInRoom = NO;
-    
-    if (!self.joinedRooms) {
-        NSLog(@"Something about this timing is off...");
-    } else {
-        NSLog(@"We all good on the room list...");
-        for (NSDictionary *tempDict in self.joinedRooms) {
-            NSString *joinedRoomID = (NSString *)[tempDict objectForKey:@"id"];
-            NSLog(@"Joined room ID: %@", joinedRoomID);
-            
-            if ([roomID intValue] == [joinedRoomID intValue]) {
-                //NSLog(@"User is already in the room. Just fetch the room info...");
-                isInRoom = YES;
-            }
-        }
-        
-    }
-    if (isInRoom) {
-        NSLog(@"User is already in room. Fetch room details.");
-        [[GeoChatManager sharedManager] fetchRoomForID:roomID];
-    } else {
-        NSLog(@"User is not in room. Add, then fetch room info.");
-        [[GeoChatManager sharedManager] addUserToRoom:roomID];
-    }
-    
-    
-    
+    [[GeoChatAPIManager sharedManager] fetchRoomForID:roomID];
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -311,15 +248,12 @@ BOOL isAuth;
                 [self.locationManager requestAlwaysAuthorization];
             } else {
                 NSLog(@"Starting location services...");
-                [_locationManager startUpdatingLocation];
+                [self.locationManager startUpdatingLocation];
                 self.navigationItem.leftBarButtonItem.enabled = YES;
                 self.navigationItem.rightBarButtonItem.enabled = YES;
                 
                 [self.view addSubview:self.indicatorView];
                 [self.indicatorView startAnimating];
-                
-                isAuth = YES;
-                //[self fetchRooms];
             }
         } else if (status == kCLAuthorizationStatusRestricted) {
             NSLog(@"Status restricted...");
@@ -351,14 +285,10 @@ BOOL isAuth;
             self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
             self.navigationItem.leftBarButtonItem.enabled = YES;
             self.navigationItem.rightBarButtonItem.enabled = YES;
-            isAuth = YES;
-            
             NSLog(@"Most recent location: %@", [self.locationManager location]);
             
             [self.view addSubview:self.indicatorView];
             [self.indicatorView startAnimating];
-            
-            //[self fetchRooms];
         }
     } else {
         NSLog(@"Status location services off");
@@ -370,16 +300,18 @@ BOOL isAuth;
         
         self.navigationItem.leftBarButtonItem.enabled = NO;
         self.navigationItem.rightBarButtonItem.enabled = NO;
-        isAuth = NO;
         [self makeTableViewBlank];
     }
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    CLLocation *location = [locations objectAtIndex:0];
+    CLLocation *location = [locations lastObject];
     NSLog(@"Gathering location: %@", location);
+    [manager stopUpdatingLocation];
+    [self fetchRooms];
     
+    /*
     CLLocationAccuracy accuracy = location.horizontalAccuracy;
     
     if (accuracy) {
@@ -387,6 +319,7 @@ BOOL isAuth;
         [manager stopUpdatingLocation];
         [self fetchRooms];
     }
+     */
 }
 
 #pragma mark - action sheet delegate
@@ -396,12 +329,7 @@ BOOL isAuth;
     switch (buttonIndex) {
         case 0:{
             NSLog(@"Getting user info...");
-            UserViewController *controller = [[UserViewController alloc] init];
-            controller.currentUser = [[GeoChatManager sharedManager] currentUser];
             
-            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-            
-            [self.navigationController presentViewController:navController animated:YES completion:nil];
         }
             break;
             

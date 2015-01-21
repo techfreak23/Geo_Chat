@@ -125,7 +125,7 @@ dispatch_queue_t kBgQueue;
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishLoggingIn" object:nil];
             });
             
-            [self fetchRoomsForLatitude:@"35.259484" longitude:@"-120.687875"];
+            //[self fetchRoomsForLatitude:@"35.259484" longitude:@"-120.687875"];
             
         } failure:^(NSError *error) {
             NSLog(@"Did finish with error: %@", error.description);
@@ -159,7 +159,14 @@ dispatch_queue_t kBgQueue;
     NSDictionary *parameters = @{@"access_token":AccessToken, @"latitude":latitude, @"longitude":longitude, @"offest": @"0", @"size": @"10", @"radius": @"10"};
     
     [self sendGETForBaseURL:@"api/v1/chat_rooms" parameters:parameters completion:^(id responseItem, NSError *error) {
-        
+        if (!error) {
+            NSLog(@"Did finish successfully...");
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishFetchingRooms" object:responseItem];
+            });
+        } else {
+            NSLog(@"Something went wrong fetching the rooms: %@", error);
+        }
     }];
 }
 
@@ -172,6 +179,9 @@ dispatch_queue_t kBgQueue;
         [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responeItem, NSError *error) {
             if (!error) {
                 NSLog(@"Finished fetching room with response item: %@", responeItem);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishRoomInfo" object:responeItem];
+                });
             } else {
                 NSLog(@"Finished fetching room with error: %@", error.description);
             }
@@ -189,6 +199,9 @@ dispatch_queue_t kBgQueue;
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
             NSLog(@"Did finish creating room: %@", responseItem);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishCreatingRoom" object:responseItem];
+            });
         } else {
             NSLog(@"Failed to create room: %@", error.description);
         }
@@ -233,6 +246,9 @@ dispatch_queue_t kBgQueue;
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
             NSLog(@"%s : %@", __PRETTY_FUNCTION__, responseItem);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingMessage" object:responseItem];
+            });
         } else {
             NSLog(@"%s : %@", __PRETTY_FUNCTION__, error.description);
         }
@@ -248,6 +264,7 @@ dispatch_queue_t kBgQueue;
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
             NSLog(@"User list fetched: %@", responseItem);
+            self.joinedRooms = [responseItem mutableCopy];
         } else {
             NSLog(@"Error fetching user list: %@", error.description);
         }
