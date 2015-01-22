@@ -134,8 +134,6 @@ dispatch_queue_t kBgQueue;
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishLoggingIn" object:nil];
             });
             
-            //[self fetchRoomsForLatitude:@"35.259484" longitude:@"-120.687875"];
-            
         } failure:^(NSError *error) {
             NSLog(@"Did finish with error: %@", error.description);
         }];

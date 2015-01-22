@@ -34,53 +34,7 @@ BOOL loggedIn = NO;
     //[[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
     //[[UIApplication sharedApplication] registerForRemoteNotifications];
     
-    UIViewController *controller;
-    
-    /*
-    if ([FBSession openActiveSessionWithAllowLoginUI:NO]) {
-        NSLog(@"We're good here... app delegate");
-        controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
-        [[GeoChatManager sharedManager] loginWithFacebookID:[[[FBSession activeSession] accessTokenData] accessToken]];
-    } else {
-        NSLog(@"Please show this joker the login view");
-        controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
-    }
-    */
-    
-    if ([FBSession activeSession].isOpen) {
-        NSLog(@"The session is still open...");
-        // try to open session with existing valid token
-        NSArray *permissions = [[NSArray alloc] initWithObjects:
-                                @"user_likes",
-                                @"read_stream",
-                                @"publish_actions",
-                                nil];
-        FBSession *session = [[FBSession alloc] initWithPermissions:permissions];
-        [FBSession setActiveSession:session];
-        
-        if ([FBSession openActiveSessionWithAllowLoginUI:NO]) {
-            NSLog(@"We're good here... app delegate");
-            controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
-        } else {
-            NSLog(@"Please show this joker the login view");
-            controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
-        }
-    } else {
-        NSLog(@"Possibly a first time user.... because the session isnt open?");
-        controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
-    }
-    
-    
-    /*
-    if (loggedIn) {
-        MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
-        self.navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    } else {
-        LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
-        self.navController = [[UINavigationController alloc] initWithRootViewController:controller];
-        self.navController.navigationBarHidden = YES;
-    }
-     */
+    LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
     
     self.navController = [[UINavigationController alloc] initWithRootViewController:controller];
     

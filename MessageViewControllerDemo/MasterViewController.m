@@ -13,7 +13,6 @@
 #import "MasterViewController.h"
 #import "AddRoomViewController.h"
 #import "UserViewController.h"
-#import "SettingsViewController.h"
 #import "LoginViewController.h"
 #import "GeoChatAPIManager.h"
 #import "MessagesViewController.h"
