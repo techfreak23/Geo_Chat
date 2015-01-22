@@ -9,8 +9,6 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "LoginViewController.h"
 #import "MasterViewController.h"
-#import "UYLPasswordManager.h"
-#import "GeoChatManager.h"
 #import "GeoChatAPIManager.h"
 
 #define kFacebookTokenIdentifier @"facebookToken"
@@ -62,7 +60,6 @@
 {
     NSLog(@"%s: %@", __PRETTY_FUNCTION__, user);
     
-    //[[GeoChatManager sharedManager] loginWithFacebookID:[[[FBSession activeSession] accessTokenData] accessToken]];
     [[GeoChatAPIManager sharedManager] loginWithAssertion:[[[FBSession activeSession] accessTokenData] accessToken]];
 }
 

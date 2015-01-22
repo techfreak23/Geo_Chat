@@ -16,7 +16,6 @@
 #import "SettingsViewController.h"
 #import "LoginViewController.h"
 #import "GeoChatAPIManager.h"
-#import "GeoChatManager.h"
 #import "MessagesViewController.h"
 
 
@@ -104,7 +103,6 @@ static NSString *reuseIdentifier = @"Cell";
     CLLocation *location = self.locationManager.location;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
-    //[[GeoChatManager sharedManager] fetchRoomsWithLatitude:latitude longitude:longitude offset:@"0" size:@"50" radius:@"100"];
     [[GeoChatAPIManager sharedManager] fetchRoomsForLatitude:latitude longitude:longitude];
 }
 
@@ -180,7 +178,6 @@ static NSString *reuseIdentifier = @"Cell";
     cell.textLabel.text = [[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"name"];
     cell.detailTextLabel.textColor = [UIColor lightGrayColor];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %.2f", [[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"] floatValue]];
-    //cell.
     
     return cell;
 }

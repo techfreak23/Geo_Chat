@@ -8,7 +8,7 @@
 
 #import "MessagesViewController.h"
 #import "UserListViewController.h"
-
+#import "GeoChatAPIManager.h"
 
 @interface MessagesViewController () <UIAlertViewDelegate, UIActionSheetDelegate>
 
@@ -33,9 +33,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishSendingWithSuccess:) name:@"didFinishSendingWithSuccess" object:nil];
     
-    self.currentUser = [GeoChatManager sharedManager].currentUser;
-    self.senderId = (NSString *)self.currentUser.userID;
-    self.senderDisplayName = (NSString *)self.currentUser.nickname;
+    
     self.showLoadEarlierMessagesHeader = NO;
     
     NSLog(@"Room info: %@", self.roomInfo);
@@ -222,7 +220,8 @@
     NSLog(@"%s", __PRETTY_FUNCTION__);
     NSLog(@"Did press send button with button: %@\nmessage: %@\nsenderID: %@\nDisplay Name: %@", button, text, senderId, senderDisplayName);
     NSString *roomID = [self.roomInfo objectForKey:@"id"];
-    [[GeoChatManager sharedManager] sendMessageWithText:text forChatRoomID:roomID];
+    
+    [[GeoChatAPIManager sharedManager] sendMessage:text room:roomID];
     
     JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", senderId] senderDisplayName:(NSString *)senderDisplayName date:date text:text];
     

@@ -63,12 +63,15 @@ dispatch_queue_t kBgQueue;
 - (void)sendGETForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
-        [[AFHTTPRequestOperationManager manager] GET:[NSString stringWithFormat:@"%@/%@", kGeoChatEndpoint, baseURL] parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [self.operationManager GET:[NSString stringWithFormat:@"%@/%@", kGeoChatEndpoint, baseURL] parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish GET with object: %@", responseObject);
+            handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish GET with error: %@", error.description);
+            handler(nil, error);
         }];
     });
+    
 }
 
 - (void)sendPOSTForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
@@ -76,8 +79,10 @@ dispatch_queue_t kBgQueue;
     dispatch_async(kBgQueue, ^{
         [self.operationManager POST:[NSString stringWithFormat:@"%@/%@", kGeoChatEndpoint, baseURL] parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish POST with object: %@", responseObject);
+            handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish POST with error: %@", error.description);
+            handler(nil, error);
         }];
     });
 }
@@ -87,8 +92,10 @@ dispatch_queue_t kBgQueue;
     dispatch_async(kBgQueue, ^{
         [self.operationManager PATCH:baseURL parameters:self success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish PATCH with object: %@", responseObject);
+            handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish PATCH with error: %@", error.description);
+            handler(nil, error);
         }];
     });
 }
@@ -98,8 +105,10 @@ dispatch_queue_t kBgQueue;
     dispatch_async(kBgQueue, ^{
         [self.operationManager DELETE:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish DELETE with object: %@", responseObject);
+            handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finsih DELETE with error: %@", error.description);
+            handler(nil, error);
         }];
     });
 }

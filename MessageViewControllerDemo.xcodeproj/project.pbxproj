@@ -28,9 +28,6 @@
 		048075021A3580D2006DAD33 /* ConstrainedTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048075001A3580D2006DAD33 /* ConstrainedTableViewCell.xib */; };
 		048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */; };
 		048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */; };
-		048CF7441A2D610C004E20BE /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7421A2D610C004E20BE /* SettingsViewController.m */; };
-		048CF7451A2D610C004E20BE /* SettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF7431A2D610C004E20BE /* SettingsViewController.xib */; };
-		048CF74A1A2D9565004E20BE /* GeoChatManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7471A2D9565004E20BE /* GeoChatManager.m */; };
 		048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7491A2D9565004E20BE /* GeoChatUser.m */; };
 		381F53ADBFB305A8851901A3 /* libPods-MessageViewControllerDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1608F6913E34230E3B0B89D /* libPods-MessageViewControllerDemo.a */; };
 		965108491A3945DA00AACBFE /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965108481A3945DA00AACBFE /* FacebookSDK.framework */; };
@@ -93,11 +90,6 @@
 		048CF73C1A2D60AB004E20BE /* AddRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddRoomViewController.h; sourceTree = "<group>"; };
 		048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddRoomViewController.m; sourceTree = "<group>"; };
 		048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddRoomViewController.xib; sourceTree = "<group>"; };
-		048CF7411A2D610C004E20BE /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
-		048CF7421A2D610C004E20BE /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
-		048CF7431A2D610C004E20BE /* SettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SettingsViewController.xib; sourceTree = "<group>"; };
-		048CF7461A2D9565004E20BE /* GeoChatManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeoChatManager.h; sourceTree = "<group>"; };
-		048CF7471A2D9565004E20BE /* GeoChatManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatManager.m; sourceTree = "<group>"; };
 		048CF7481A2D9565004E20BE /* GeoChatUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeoChatUser.h; sourceTree = "<group>"; };
 		048CF7491A2D9565004E20BE /* GeoChatUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatUser.m; sourceTree = "<group>"; };
 		04F4A1521A5A268C0001CAA3 /* GeoChatAPNSs.mobileprovision */ = {isa = PBXFileReference; lastKnownFileType = file; path = GeoChatAPNSs.mobileprovision; sourceTree = "<group>"; };
@@ -157,12 +149,6 @@
 			isa = PBXGroup;
 			children = (
 				04F4A1521A5A268C0001CAA3 /* GeoChatAPNSs.mobileprovision */,
-				968310B21A4B6BEF006C5428 /* actions-ellipse.png */,
-				968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */,
-				968310B11A4B6BEF006C5428 /* actions-ellipse@3x.png */,
-				96F597FB1A4FC9BB00414D05 /* System-settings-icon.png */,
-				96F597FC1A4FC9BB00414D05 /* System-settings-icon@2x.png */,
-				96F597FD1A4FC9BB00414D05 /* System-settings-icon@3x.png */,
 				042440DB1A2BE089004B0786 /* MessageViewControllerDemo */,
 				042440F51A2BE089004B0786 /* MessageViewControllerDemoTests */,
 				042440DA1A2BE089004B0786 /* Products */,
@@ -183,42 +169,40 @@
 		042440DB1A2BE089004B0786 /* MessageViewControllerDemo */ = {
 			isa = PBXGroup;
 			children = (
+				04DBE9731A70781400B4392B /* Icons */,
 				048CF74C1A2D958E004E20BE /* GeoChatManager */,
-				042440E01A2BE089004B0786 /* AppDelegate.h */,
-				042440E11A2BE089004B0786 /* AppDelegate.m */,
-				042441081A2C0DBB004B0786 /* MasterViewController.h */,
-				042441091A2C0DBB004B0786 /* MasterViewController.m */,
-				0424410A1A2C0DBB004B0786 /* MasterViewController.xib */,
-				96F597F41A4FC74B00414D05 /* RoomMapViewController.h */,
-				96F597F51A4FC74B00414D05 /* RoomMapViewController.m */,
-				96F597F61A4FC74B00414D05 /* RoomMapViewController.xib */,
-				0421F2C51A30544500FCAB04 /* MessagesViewController.h */,
-				0421F2C61A30544500FCAB04 /* MessagesViewController.m */,
-				96AD7C101A4F75460019AF96 /* UserListViewController.h */,
-				96AD7C111A4F75460019AF96 /* UserListViewController.m */,
-				96AD7C121A4F75460019AF96 /* UserListViewController.xib */,
-				0424410D1A2C0E00004B0786 /* LoginViewController.h */,
-				0424410E1A2C0E00004B0786 /* LoginViewController.m */,
-				0424410F1A2C0E00004B0786 /* LoginViewController.xib */,
 				048CF73C1A2D60AB004E20BE /* AddRoomViewController.h */,
 				048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */,
 				048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */,
+				042440E01A2BE089004B0786 /* AppDelegate.h */,
+				042440E11A2BE089004B0786 /* AppDelegate.m */,
+				044A7FC81A359A2100EADA8A /* ChangeNicknameViewController.h */,
+				044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */,
 				048074FE1A3580D2006DAD33 /* ConstrainedTableViewCell.h */,
 				048074FF1A3580D2006DAD33 /* ConstrainedTableViewCell.m */,
 				048075001A3580D2006DAD33 /* ConstrainedTableViewCell.xib */,
-				048CF7411A2D610C004E20BE /* SettingsViewController.h */,
-				048CF7421A2D610C004E20BE /* SettingsViewController.m */,
-				048CF7431A2D610C004E20BE /* SettingsViewController.xib */,
-				048074FB1A353DC1006DAD33 /* UserViewController.h */,
-				048074FC1A353DC1006DAD33 /* UserViewController.m */,
-				044A7FC81A359A2100EADA8A /* ChangeNicknameViewController.h */,
-				044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */,
+				042440EB1A2BE089004B0786 /* LaunchScreen.xib */,
+				0424410D1A2C0E00004B0786 /* LoginViewController.h */,
+				0424410E1A2C0E00004B0786 /* LoginViewController.m */,
+				0424410F1A2C0E00004B0786 /* LoginViewController.xib */,
+				042441081A2C0DBB004B0786 /* MasterViewController.h */,
+				042441091A2C0DBB004B0786 /* MasterViewController.m */,
+				0424410A1A2C0DBB004B0786 /* MasterViewController.xib */,
+				0421F2C51A30544500FCAB04 /* MessagesViewController.h */,
+				0421F2C61A30544500FCAB04 /* MessagesViewController.m */,
 				0421F2CD1A314D4300FCAB04 /* ProfileViewController.h */,
 				0421F2CE1A314D4300FCAB04 /* ProfileViewController.m */,
-				042440E91A2BE089004B0786 /* Images.xcassets */,
-				042440EB1A2BE089004B0786 /* LaunchScreen.xib */,
-				0421F2C41A30531000FCAB04 /* Frameworks */,
+				96F597F41A4FC74B00414D05 /* RoomMapViewController.h */,
+				96F597F51A4FC74B00414D05 /* RoomMapViewController.m */,
+				96F597F61A4FC74B00414D05 /* RoomMapViewController.xib */,
+				96AD7C101A4F75460019AF96 /* UserListViewController.h */,
+				96AD7C111A4F75460019AF96 /* UserListViewController.m */,
+				96AD7C121A4F75460019AF96 /* UserListViewController.xib */,
+				048074FB1A353DC1006DAD33 /* UserViewController.h */,
+				048074FC1A353DC1006DAD33 /* UserViewController.m */,
 				042440DC1A2BE089004B0786 /* Supporting Files */,
+				042440E91A2BE089004B0786 /* Images.xcassets */,
+				0421F2C41A30531000FCAB04 /* Frameworks */,
 			);
 			path = MessageViewControllerDemo;
 			sourceTree = "<group>";
@@ -254,12 +238,24 @@
 			children = (
 				044927531A6F1CD90051C3AA /* GeoChatAPIManager.h */,
 				044927541A6F1CD90051C3AA /* GeoChatAPIManager.m */,
-				048CF7461A2D9565004E20BE /* GeoChatManager.h */,
-				048CF7471A2D9565004E20BE /* GeoChatManager.m */,
 				048CF7481A2D9565004E20BE /* GeoChatUser.h */,
 				048CF7491A2D9565004E20BE /* GeoChatUser.m */,
 			);
 			name = GeoChatManager;
+			sourceTree = "<group>";
+		};
+		04DBE9731A70781400B4392B /* Icons */ = {
+			isa = PBXGroup;
+			children = (
+				968310B21A4B6BEF006C5428 /* actions-ellipse.png */,
+				968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */,
+				968310B11A4B6BEF006C5428 /* actions-ellipse@3x.png */,
+				96F597FB1A4FC9BB00414D05 /* System-settings-icon.png */,
+				96F597FC1A4FC9BB00414D05 /* System-settings-icon@2x.png */,
+				96F597FD1A4FC9BB00414D05 /* System-settings-icon@3x.png */,
+			);
+			name = Icons;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		48BD3C10028BAC8C9D0FCEA5 /* Frameworks */ = {
@@ -377,7 +373,6 @@
 			files = (
 				96F597FF1A4FC9BB00414D05 /* System-settings-icon@2x.png in Resources */,
 				048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */,
-				048CF7451A2D610C004E20BE /* SettingsViewController.xib in Resources */,
 				048075021A3580D2006DAD33 /* ConstrainedTableViewCell.xib in Resources */,
 				042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */,
 				042440ED1A2BE089004B0786 /* LaunchScreen.xib in Resources */,
@@ -448,9 +443,7 @@
 				048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */,
 				042440E21A2BE089004B0786 /* AppDelegate.m in Sources */,
 				044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */,
-				048CF74A1A2D9565004E20BE /* GeoChatManager.m in Sources */,
 				0421F2CF1A314D4300FCAB04 /* ProfileViewController.m in Sources */,
-				048CF7441A2D610C004E20BE /* SettingsViewController.m in Sources */,
 				048075011A3580D2006DAD33 /* ConstrainedTableViewCell.m in Sources */,
 				96AD7C131A4F75460019AF96 /* UserListViewController.m in Sources */,
 				0424410B1A2C0DBB004B0786 /* MasterViewController.m in Sources */,

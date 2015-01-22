@@ -9,7 +9,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <MapKit/MapKit.h>
 #import "AddRoomViewController.h"
-#import "GeoChatManager.h"
+#import "GeoChatAPIManager.h"
 
 @interface AddRoomViewController () <UIAlertViewDelegate, UITextFieldDelegate, UIAlertViewDelegate, MKMapViewDelegate>
 
@@ -70,7 +70,7 @@
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
     
-    [[GeoChatManager sharedManager] createRoomWithName:self.roomNameField.text latitude:latitude longitude:longitude];
+    [[GeoChatAPIManager sharedManager] createRoom:self.roomNameField.text latitude:latitude longitude:longitude];
 }
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification

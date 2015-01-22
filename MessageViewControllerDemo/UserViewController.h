@@ -7,10 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "GeoChatManager.h"
+#import "GeoChatAPIManager.h"
 
 @interface UserViewController : UITableViewController
-
-@property (nonatomic, strong) GeoChatUser *currentUser;
 
 @end
