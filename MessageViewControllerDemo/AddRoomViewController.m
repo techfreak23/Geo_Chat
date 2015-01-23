@@ -34,6 +34,9 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
     
+    self.tableView.backgroundColor = [UIColor colorWithRed:206.0/255.0f green:237.0/255.0f blue:219.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:133.0/255.0f green:186.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    
     self.title = @"Add room";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(cancelAdd)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(createNewRoom)];
@@ -119,6 +122,8 @@
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
     }
+    
+    cell.backgroundColor = [UIColor clearColor];
     
     CGRect frame = [[UIScreen mainScreen] bounds];
     

@@ -43,6 +43,9 @@ static NSString *reuseIdentifier = @"Cell";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
+    self.tableView.backgroundColor = [UIColor colorWithRed:206.0/255.0f green:237.0/255.0f blue:219.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:133.0/255.0f green:186.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
     [refresh addTarget:self action:@selector(fetchRooms) forControlEvents:UIControlEventValueChanged];
@@ -177,6 +180,7 @@ static NSString *reuseIdentifier = @"Cell";
     cell.textLabel.text = [[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"name"];
     cell.detailTextLabel.textColor = [UIColor lightGrayColor];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %.2f", [[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"] floatValue]];
+    cell.backgroundColor = [UIColor clearColor];
     
     return cell;
 }
