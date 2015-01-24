@@ -54,6 +54,7 @@ dispatch_queue_t kBgQueue;
         _operationManager = [AFHTTPRequestOperationManager manager];
         AFJSONRequestSerializer *requestSerial = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
         AFJSONResponseSerializer *responseSerial = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+        _operationManager.completionQueue = kBgQueue;
         _operationManager.requestSerializer = requestSerial;
         _operationManager.responseSerializer = responseSerial;
         _joinedRooms = [@[] mutableCopy];

@@ -43,7 +43,7 @@ static NSString *reuseIdentifier = @"Cell";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
-    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:88.0/255.0f green:129.0/255.0f blue:87.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:123.0/255.0f green:205.0/255.0f blue:186.0/255.0f alpha:1.0f];
     
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
