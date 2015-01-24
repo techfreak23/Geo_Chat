@@ -33,6 +33,7 @@
     //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRoomWithError:) name:@"didFinishRoomWithError" object:nil];
     
     self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:58.0/255.0f green:90.0/255.0f blue:64.0/255.0f alpha:1.0f];
     
@@ -83,6 +84,14 @@
         NSLog(@"Dismissed add room view with completion...");
         [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishAddingRoom" object:[notification object]];
     }];
+}
+
+- (void)didFinishRoomWithError:(NSNotification *)notification
+{
+    NSLog(@"There was an error...");
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops!" message:@"Something went wrong with creating the room :(" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+    [alert show];
 }
 
 - (void)updateLocation

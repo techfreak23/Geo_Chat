@@ -52,6 +52,10 @@ dispatch_queue_t kBgQueue;
         NSLog(@"The API manager is initialized...");
         kBgQueue = dispatch_queue_create("com.MosRedRocket.GeoChatManager.bgqueue", NULL);
         _operationManager = [AFHTTPRequestOperationManager manager];
+        AFJSONRequestSerializer *requestSerial = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
+        AFJSONResponseSerializer *responseSerial = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+        _operationManager.requestSerializer = requestSerial;
+        _operationManager.responseSerializer = responseSerial;
         _joinedRooms = [@[] mutableCopy];
     }
     
@@ -211,6 +215,9 @@ dispatch_queue_t kBgQueue;
             });
         } else {
             NSLog(@"Failed to create room: %@", error.description);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishRoomWithError" object:error];
+            });
         }
     }];
 }
