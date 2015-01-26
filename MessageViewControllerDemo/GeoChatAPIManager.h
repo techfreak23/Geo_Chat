@@ -12,6 +12,8 @@
 
 + (GeoChatAPIManager *)sharedManager;
 
+- (NSMutableDictionary *)userInfo;
+
 - (void)loginWithAssertion:(NSString *)assertion;
 - (void)logout;
 - (void)fetchRoomsForLatitude:(NSString *)latitude longitude:(NSString *)longitude;

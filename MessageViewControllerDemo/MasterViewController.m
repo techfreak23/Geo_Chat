@@ -39,11 +39,18 @@ static NSString *reuseIdentifier = @"Cell";
     
     NSLog(@"Master view loading...");
     
-    self.title = @"GeoChat!";
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    
+    self.navigationItem.title = @"GeoChat!";
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
-    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:123.0/255.0f green:205.0/255.0f blue:186.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    
+    self.view.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
     
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
@@ -54,8 +61,11 @@ static NSString *reuseIdentifier = @"Cell";
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     
     CGRect frame = [[UIScreen mainScreen] bounds];
+    CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
+    CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
+    CGFloat combHeight = statusHeight + navHeight;
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 50, frame.size.height/2 - 50, 200.0, 200.0)];
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake((frame.size.width)/2, (frame.size.height - combHeight)/2, 200.0, 200.0)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     
     self.locationManager = [[CLLocationManager alloc] init];
@@ -92,6 +102,22 @@ static NSString *reuseIdentifier = @"Cell";
     [alert show];
 }
 
+- (void)alertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton otherButtonTitles:(NSArray*)otherButtons tag:(NSInteger)tag
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:title message:message delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
+    
+    if (otherButtons) {
+        for (NSString *temp in otherButtons) {
+            [alert addButtonWithTitle:temp];
+        }
+    }
+    
+    [alert addButtonWithTitle:cancelButton];
+    alert.tag = tag;
+    
+    [alert show];
+}
+
 - (void)stopRefresh
 {
     [self.refreshControl endRefreshing];
@@ -119,6 +145,7 @@ static NSString *reuseIdentifier = @"Cell";
 {
     
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
+    actionSheet.tintColor = [UIColor colorWithRed:20.0/255.0f green:204.0/255.0f blue:96.0/255.0f alpha:1.0f];
     [actionSheet showInView:self.view];
 }
 
@@ -151,6 +178,9 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
 {
     NSLog(@"Did finish room info notif...");
+    MessagesViewController *controller = [[MessagesViewController alloc] init];
+    controller.roomInfo = (NSMutableDictionary *)[notification object];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 #pragma mark - Table view data source
@@ -177,7 +207,8 @@ static NSString *reuseIdentifier = @"Cell";
     
     [cell.contentView sizeToFit];
     cell.textLabel.text = [[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"name"];
-    cell.detailTextLabel.textColor = [UIColor lightGrayColor];
+    cell.textLabel.font = [UIFont systemFontOfSize:17.0f];
+    cell.detailTextLabel.textColor = [UIColor darkGrayColor];
     cell.detailTextLabel.text = [NSString stringWithFormat:@"Distance: %.2f", [[[self.roomItems objectAtIndex:indexPath.row] objectForKey:@"distance"] floatValue]];
     
     return cell;
@@ -242,10 +273,8 @@ static NSString *reuseIdentifier = @"Cell";
     if (locationServices) {
         if (status == kCLAuthorizationStatusNotDetermined) {
             if (IS_IOS_8_OR_LATER) {
-                NSLog(@"Starting location services on iOS 8...");
-                [self.locationManager requestAlwaysAuthorization];
+                [self.locationManager requestWhenInUseAuthorization];
             } else {
-                NSLog(@"Starting location services...");
                 [self.locationManager startUpdatingLocation];
                 self.navigationItem.leftBarButtonItem.enabled = YES;
                 self.navigationItem.rightBarButtonItem.enabled = YES;
@@ -267,7 +296,8 @@ static NSString *reuseIdentifier = @"Cell";
             
         } else if (status == kCLAuthorizationStatusDenied) {
             NSLog(@"Status denied...");
-            [self showAlertViewWithTitle:@"Sorry" message:@"In order to use GeoChat, we must be able to use your location to find chat rooms nearby. Please re-enable GeoChat for Location Services." cancelButton:@"Got it!"];
+            
+            [self alertViewWithTitle:@"Sorry" message:@"In order to use GeoChat, we must be able to use your location to find chat rooms nearby. Please re-enable GeoChat for Location Services." cancelButton:@"Got it!" otherButtonTitles:@[@"Settings"] tag:202];
             
             messageLabel.text = @"Location services are 'off' for GeoChat";
             self.tableView.backgroundView = messageLabel;
@@ -290,7 +320,7 @@ static NSString *reuseIdentifier = @"Cell";
         }
     } else {
         NSLog(@"Status location services off");
-        [self showAlertViewWithTitle:@"Sorry about this!" message:@"It looks like you have Location Services disabled. GeoChat requires the use of your location to find the nearest chat rooms. Please enable your Location Services if you wish to use our service." cancelButton:@"Got it!"];
+        [self alertViewWithTitle:@"Location Services disabled" message:@"In order to use GeoChat, we must be able to use your location to find and create rooms. Please re-enable Location Services if you wish to continue to use GeoChat." cancelButton:@"Got it!" otherButtonTitles:@[@"Settings"] tag:201];
         
         messageLabel.text = @"Please re-enable Location Services in order to use GeoChat.";
         self.tableView.backgroundView = messageLabel;
@@ -308,16 +338,6 @@ static NSString *reuseIdentifier = @"Cell";
     NSLog(@"Gathering location: %@", location);
     [manager stopUpdatingLocation];
     [self fetchRooms];
-    
-    /*
-    CLLocationAccuracy accuracy = location.horizontalAccuracy;
-    
-    if (accuracy) {
-        NSLog(@"The location manager has the needed accuracy...");
-        [manager stopUpdatingLocation];
-        [self fetchRooms];
-    }
-     */
 }
 
 #pragma mark - action sheet delegate
@@ -333,8 +353,8 @@ static NSString *reuseIdentifier = @"Cell";
             
         case 1:{
             NSLog(@"User wants to logout");
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Logout" message:@"Are you sure?" delegate:self cancelButtonTitle:@"Never mind" otherButtonTitles:@"Yes", nil];
-            [alert show];
+            
+            [self alertViewWithTitle:@"Logout" message:@"Are you sure?" cancelButton:@"Never mind" otherButtonTitles:@[@"Logout"] tag:203];
         }
             break;
             
@@ -347,13 +367,67 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)alertView:(UIAlertView *)alertView willDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-    switch (buttonIndex) {
-        case 0:
-            NSLog(@"Cancelling...?");
+    switch (alertView.tag) {
+        case 201: {
+            NSLog(@"Location settings alert view");
+            switch (buttonIndex) {
+                case 0: {
+                    NSLog(@"Button 0");
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+                    break;
+                
+                case 1: {
+                    NSLog(@"Button 1");
+                }
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
             break;
             
-        case 1:
-            NSLog(@"Logging out...");
+        case 202: {
+            NSLog(@"Access denied alert view");
+            switch (buttonIndex) {
+                case 0: {
+                    NSLog(@"Botton 0");
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+                    break;
+                    
+                case 1: {
+                    NSLog(@"Button 1");
+                }
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+            break;
+            
+        case 203: {
+            NSLog(@"Logging out alert view...");
+            
+            switch (buttonIndex) {
+                case 0: {
+                    NSLog(@"Button 0...");
+                    [[FBSession activeSession] closeAndClearTokenInformation];
+                    [[GeoChatAPIManager sharedManager] logout];
+                    LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
+                    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+                    [self presentViewController:navController animated:YES completion:nil];
+                }
+                    break;
+                    
+                case 1: {
+                    NSLog(@"Button 1...");
+                }
+                    break;
+            }
+        }
             break;
             
         default:

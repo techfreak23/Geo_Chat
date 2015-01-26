@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 Art Sevilla. All rights reserved.
 //
 
-#import <FacebookSDK/FacebookSDK.h>
 #import "LoginViewController.h"
 #import "MasterViewController.h"
 #import "GeoChatAPIManager.h"
@@ -31,8 +30,11 @@
     
     self.title = @"Welcome to GeoChat!";
     self.navigationController.navigationBarHidden = YES;
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [self setNeedsStatusBarAppearanceUpdate];
     
-    self.view.backgroundColor = [UIColor colorWithRed:97.0/255.0f green:226.0/255.0f blue:148.0/255.0f alpha:1.0f];
+    self.view.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
     
     // Do any additional setup after loading the view from its nib.
     self.loginView.delegate = self;
@@ -44,6 +46,11 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return UIStatusBarStyleLightContent;
 }
 
 - (void)didReceiveMemoryWarning

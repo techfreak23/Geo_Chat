@@ -20,6 +20,7 @@ typedef void (^RequestCompletion)(id responseItem, NSError *error);
 @property (nonatomic, strong) AFHTTPRequestOperationManager *operationManager;
 @property (nonatomic, strong) AFOAuth2Manager *oAuthManager;
 @property (nonatomic, strong) NSMutableArray *joinedRooms;
+@property (nonatomic, strong) NSMutableDictionary *userInfo;
 
 @end
 
@@ -51,16 +52,19 @@ dispatch_queue_t kBgQueue;
     if (self) {
         NSLog(@"The API manager is initialized...");
         kBgQueue = dispatch_queue_create("com.MosRedRocket.GeoChatManager.bgqueue", NULL);
-        _operationManager = [AFHTTPRequestOperationManager manager];
-        AFJSONRequestSerializer *requestSerial = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
-        AFJSONResponseSerializer *responseSerial = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+        _operationManager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@", kGeoChatEndpoint]]];
         _operationManager.completionQueue = kBgQueue;
-        _operationManager.requestSerializer = requestSerial;
-        _operationManager.responseSerializer = responseSerial;
+        _operationManager.requestSerializer = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
+        _operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
         _joinedRooms = [@[] mutableCopy];
     }
     
     return self;
+}
+
+- (NSMutableDictionary *)userInfo
+{
+    return _userInfo;
 }
 
 #pragma mark - Request methods
@@ -68,7 +72,7 @@ dispatch_queue_t kBgQueue;
 - (void)sendGETForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
-        [self.operationManager GET:[NSString stringWithFormat:@"%@/%@", kGeoChatEndpoint, baseURL] parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [self.operationManager GET:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish GET with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -82,7 +86,7 @@ dispatch_queue_t kBgQueue;
 - (void)sendPOSTForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
-        [self.operationManager POST:[NSString stringWithFormat:@"%@/%@", kGeoChatEndpoint, baseURL] parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        [self.operationManager POST:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish POST with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -161,7 +165,8 @@ dispatch_queue_t kBgQueue;
 
 - (void)logout
 {
-    NSLog(@"Logging out...");
+    NSLog(@"Logging out and clearing token info...");
+    [AFOAuthCredential deleteCredentialWithIdentifier:kOAuthTokenIdentifier];
 }
 
 #pragma mark - misc methods for rooms etc
@@ -188,6 +193,7 @@ dispatch_queue_t kBgQueue;
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     if ([self checkID:roomID]) {
+        NSLog(@"Use was in the room so now we fetch room info...");
         [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responeItem, NSError *error) {
             if (!error) {
                 NSLog(@"Finished fetching room with response item: %@", responeItem);
@@ -199,6 +205,7 @@ dispatch_queue_t kBgQueue;
             }
         }];
     } else {
+        NSLog(@"User was not in the room so now we have to add them...");
         [self addUserToRoom:roomID];
     }
 }
@@ -210,7 +217,7 @@ dispatch_queue_t kBgQueue;
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
-            NSLog(@"Did finish creating room: %@", responseItem);
+            NSLog(@"%s", __PRETTY_FUNCTION__);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishCreatingRoom" object:responseItem];
             });
@@ -244,12 +251,13 @@ dispatch_queue_t kBgQueue;
     if (self.joinedRooms.count > 0) {
         for (NSDictionary *temp in self.joinedRooms) {
             NSString *tempID = [temp objectForKey:@"id"];
-            if ([tempID isEqualToString:roomID]) {
+            if ([tempID isEqual:roomID]) {
+                NSLog(@"This user is already in the room...");
                 return YES;
             }
         }
     }
-    
+    NSLog(@"The user was not in the room...");
     return NO;
 }
 
@@ -278,7 +286,7 @@ dispatch_queue_t kBgQueue;
     
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
-            NSLog(@"User list fetched: %@", responseItem);
+            NSLog(@"User list fetched...");
             self.joinedRooms = [responseItem mutableCopy];
         } else {
             NSLog(@"Error fetching user list: %@", error.description);

@@ -40,10 +40,9 @@
     
     self.messages = [self.roomInfo objectForKey:@"messages"];
     
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actions-ellipse"] style:UIBarButtonItemStylePlain target:self action:@selector(showOptions)];
     
-    [self createJSQMessages];
+    //[self createJSQMessages];
 }
 
 - (void)viewWillDisappear:(BOOL)animated

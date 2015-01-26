@@ -23,6 +23,8 @@ BOOL loggedIn = NO;
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
+    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
+    
     NSLog(@"Launch options: %@", launchOptions);
     
     // Override point for customization after application launch.

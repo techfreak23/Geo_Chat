@@ -30,12 +30,13 @@
     
     self.menuItems = @[@"Text field view", @"Location view", @"Map view"];
     
-    //self.navigationController.navigationBar.barStyle = UIBarStyleBlackTranslucent;
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRoomWithError:) name:@"didFinishRoomWithError" object:nil];
     
-    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:58.0/255.0f green:90.0/255.0f blue:64.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    self.navigationController.navigationBar.barTintColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
     
     self.title = @"Add room";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(cancelAdd)];
