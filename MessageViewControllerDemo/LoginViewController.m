@@ -8,6 +8,7 @@
 
 #import "LoginViewController.h"
 #import "MasterViewController.h"
+#import "RoomMapViewController.h"
 #import "GeoChatAPIManager.h"
 
 #define kFacebookTokenIdentifier @"facebookToken"
@@ -85,11 +86,26 @@
 {
     NSLog(@"Should be showing the main view now...");
     NSLog(@"Notification: %@", notification.description);
+    
+    UITabBarController *tabController = [[UITabBarController alloc] init];
+    
     MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];
     
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+    navController.tabBarItem.title = @"List View";
+    navController.tabBarItem.image = [UIImage imageNamed:@"menu-icon"];
     
-    [self presentViewController:navController animated:NO completion:nil];
+    RoomMapViewController *mapController = [[RoomMapViewController alloc] initWithNibName:@"RoomMapViewController" bundle:nil];
+    
+    UINavigationController *navController2 = [[UINavigationController alloc] initWithRootViewController:mapController];
+    navController2.tabBarItem.title = @"Map View";
+    navController2.tabBarItem.image = [UIImage imageNamed:@"map-icon"];
+    
+    [tabController setViewControllers:@[navController, navController2]];
+    
+    
+    
+    [self presentViewController:tabController animated:NO completion:nil];
 }
 
 @end
