@@ -15,11 +15,17 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="1vO-kc-Whq">
+                <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="1vO-kc-Whq">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                 </mapView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="1vO-kc-Whq" secondAttribute="trailing" id="8co-rM-Ttm"/>
+                <constraint firstItem="1vO-kc-Whq" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="SQg-0g-J88"/>
+                <constraint firstAttribute="bottom" secondItem="1vO-kc-Whq" secondAttribute="bottom" id="fcg-a7-9sz"/>
+                <constraint firstItem="1vO-kc-Whq" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="vzu-m3-SFo"/>
+            </constraints>
         </view>
     </objects>
 </document>

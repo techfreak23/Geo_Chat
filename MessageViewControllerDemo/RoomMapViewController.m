@@ -20,6 +20,7 @@
 
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, weak) IBOutlet MKMapView *roomMapView;
+@property (nonatomic, strong) NSMutableArray *roomItems;
 
 @end
 
@@ -31,7 +32,7 @@
     // Do any additional setup after loading the view from its nib.
     
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
-    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:9.0/255.0f green:161.0/255.0f blue:41.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];;
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     
     self.navigationItem.title = @"GeoChat!";
@@ -42,15 +43,61 @@
     self.roomMapView.showsUserLocation = YES;
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRooms:) name:@"didFinishFetchingRooms" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishRoomInfo" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - notifications
+
+- (void)didFinishWithRooms:(NSNotification *)notification
+{
+    
+}
+
+- (void)didFinishWithRoomInfo:(NSNotification *)notification
+{
+    
+}
+
+- (void)didFinishCreatingRoom:(NSNotification *)notification
+{
+    
+}
+
+#pragma mark - my methods
+
 - (void)addRoom
 {
     NSLog(@"Adding room...");
+    AddRoomViewController *controller = [[AddRoomViewController alloc] initWithNibName:@"AddRoomViewController" bundle:nil];
+    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+    [self.navigationController presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)viewSettings
 {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", @"Show list view", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
     [actionSheet showInView:self.view];
+}
+
+- (void)updateLocation
+{
+    MKUserLocation *userLocation = self.roomMapView.userLocation;
+    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
+    [self.roomMapView setRegion:region animated:YES];
+
 }
 
 - (void)alertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton otherButtonTitles:(NSArray*)otherButtons tag:(NSInteger)tag
@@ -100,7 +147,8 @@
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
-    
+    NSLog(@"User location: %@", userLocation);
+    [self updateLocation];
 }
 
 #pragma mark - action sheet delegate methods
@@ -119,30 +167,31 @@
         }
             break;
             
-        case 2: {
-            NSLog(@"Button 2...");
-        }
+        default:
             break;
     }
 }
 
 #pragma mark - alert view delegate
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     switch (alertView.tag) {
         case 200: {
             NSLog(@"Location services alert...");
             switch (buttonIndex) {
                 case 0: {
-                    NSLog(@"Button 0...");
+                    NSLog(@"Opening settings...");
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
                 }
                     break;
-                
+                    
                 case 1: {
-                    NSLog(@"Button 1...");
+                    NSLog(@"Got it...");
                 }
+                    break;
+                    
+                default:
                     break;
             }
             
@@ -150,29 +199,32 @@
             break;
             
         case 201: {
-            NSLog(@"201...");
+            NSLog(@"Location Services denied....");
             switch (buttonIndex) {
                 case 0: {
-                    NSLog(@"");
+                    NSLog(@"Opening settings...");
                     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
                 }
                     break;
                     
                 case 1: {
-                    NSLog(@"");
+                    NSLog(@"Got it...");
                 }
+                    break;
+                    
+                default:
                     break;
             }
         }
             break;
             
         case 202: {
-            NSLog(@"202");
+            NSLog(@"Location services disabled...");
         }
             break;
             
         case 203: {
-            NSLog(@"203");
+            NSLog(@"Logging out...");
             switch (buttonIndex) {
                 case 0: {
                     NSLog(@"No...");
@@ -185,8 +237,11 @@
                     [[GeoChatAPIManager sharedManager] logout];
                     LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
                     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-                    [self presentViewController:navController animated:YES completion:nil];
+                    [self presentViewController:navController animated:NO completion:nil];
                 }
+                    break;
+                    
+                default:
                     break;
             }
         }

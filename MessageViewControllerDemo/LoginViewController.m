@@ -101,10 +101,10 @@
     navController2.tabBarItem.title = @"Map View";
     navController2.tabBarItem.image = [UIImage imageNamed:@"map-icon"];
     
+    tabController.tabBar.barTintColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    tabController.tabBar.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    tabController.tabBar.tintColor = [UIColor whiteColor];
     [tabController setViewControllers:@[navController, navController2]];
-    
-    
-    
     [self presentViewController:tabController animated:NO completion:nil];
 }
 

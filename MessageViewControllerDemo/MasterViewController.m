@@ -66,7 +66,7 @@ static NSString *reuseIdentifier = @"Cell";
     CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
     CGFloat combHeight = statusHeight + navHeight;
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake((frame.size.width)/2, (frame.size.height - combHeight)/2, 200.0, 200.0)];
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(200.0, 200.0, (frame.size.width)/2, (frame.size.height - combHeight)/2)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     
     self.locationManager = [[CLLocationManager alloc] init];
@@ -145,7 +145,7 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)viewSettings
 {
     
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", @"Switch to map view", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
     actionSheet.tintColor = [UIColor colorWithRed:20.0/255.0f green:204.0/255.0f blue:96.0/255.0f alpha:1.0f];
     [actionSheet showInView:self.view];
 }
@@ -356,14 +356,6 @@ static NSString *reuseIdentifier = @"Cell";
             NSLog(@"User wants to logout");
             
             [self alertViewWithTitle:@"Logout" message:@"Are you sure?" cancelButton:@"Never mind" otherButtonTitles:@[@"Logout"] tag:203];
-        }
-            break;
-            
-        case 2: {
-            NSLog(@"Showing map view...");
-            RoomMapViewController *controller = [[RoomMapViewController alloc] initWithNibName:@"RoomMapViewController" bundle:nil];
-            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-            [self presentViewController:navController animated:NO completion:nil];
         }
             break;
             

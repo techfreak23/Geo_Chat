@@ -58,6 +58,11 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (BOOL)hidesBottomBarWhenPushed
+{
+    return YES;
+}
+
 - (void)showOptions
 {
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Show current users", @"Show room details", @"Leave room", nil];
