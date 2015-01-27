@@ -153,28 +153,33 @@
             NSLog(@"Setting name text field...");
             self.roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(10, 5, cellFrame.size.width - 10, cellFrame.size.height - 5)];
             self.roomNameField.translatesAutoresizingMaskIntoConstraints = NO;
+            self.roomNameField.textAlignment = NSTextAlignmentCenter;
             self.roomNameField.placeholder = @"Room name";
             self.roomNameField.delegate = self;
+            self.roomNameField.tintColor = [UIColor whiteColor];
+            self.roomNameField.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.80f];
             [cell.contentView addSubview:self.roomNameField];
         }
             break;
             
         case 1: {
             NSLog(@"Setting location label...");
-            self.locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width/2, cellFrame.size.height)];
+            self.locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, cellFrame.size.height)];
             self.locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
             self.locationLabel.text = @"Getting location...";
             self.locationLabel.textAlignment = NSTextAlignmentCenter;
-            self.locationLabel.backgroundColor = [UIColor lightGrayColor];
+            self.locationLabel.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.80f];
             
+            /*
             self.updateButton = [[UIButton alloc] initWithFrame:CGRectMake(self.locationLabel.frame.size.width, self.locationLabel.frame.origin.y, self.locationLabel.frame.size.width, self.locationLabel.frame.size.height)];
             self.updateButton.translatesAutoresizingMaskIntoConstraints = NO;
             [self.updateButton addTarget:self action:@selector(updateLocation) forControlEvents:UIControlEventTouchUpInside];
             self.updateButton.titleLabel.textColor = [UIColor blackColor];
             [self.updateButton setTitle:@"Update location" forState:UIControlStateNormal];
             self.updateButton.backgroundColor = [UIColor purpleColor];
+            */
             
-            [cell.contentView addSubview:self.updateButton];
+            //[cell.contentView addSubview:self.updateButton];
             [cell.contentView addSubview:self.locationLabel];
         }
             break;
