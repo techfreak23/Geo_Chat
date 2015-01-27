@@ -16,6 +16,7 @@
 #import "LoginViewController.h"
 #import "GeoChatAPIManager.h"
 #import "MessagesViewController.h"
+#import "RoomMapViewController.h"
 
 
 #define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
@@ -144,7 +145,7 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)viewSettings
 {
     
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", @"Switch to map view", nil];
     actionSheet.tintColor = [UIColor colorWithRed:20.0/255.0f green:204.0/255.0f blue:96.0/255.0f alpha:1.0f];
     [actionSheet showInView:self.view];
 }
@@ -358,6 +359,14 @@ static NSString *reuseIdentifier = @"Cell";
         }
             break;
             
+        case 2: {
+            NSLog(@"Showing map view...");
+            RoomMapViewController *controller = [[RoomMapViewController alloc] initWithNibName:@"RoomMapViewController" bundle:nil];
+            UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+            [self presentViewController:navController animated:NO completion:nil];
+        }
+            break;
+            
         default:
             break;
     }
@@ -418,7 +427,7 @@ static NSString *reuseIdentifier = @"Cell";
                     [[GeoChatAPIManager sharedManager] logout];
                     LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
                     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-                    [self presentViewController:navController animated:YES completion:nil];
+                    [self presentViewController:navController animated:NO completion:nil];
                 }
                     break;
                     

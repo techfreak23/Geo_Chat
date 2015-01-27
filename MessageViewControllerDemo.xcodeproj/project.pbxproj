@@ -22,6 +22,8 @@
 		042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0424410F1A2C0E00004B0786 /* LoginViewController.xib */; };
 		044927551A6F1CD90051C3AA /* GeoChatAPIManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 044927541A6F1CD90051C3AA /* GeoChatAPIManager.m */; };
 		044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */; };
+		046605AC1A7753A400A1D298 /* GeoChatAppIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 046605AA1A7753A400A1D298 /* GeoChatAppIcon@2x.png */; };
+		046605AD1A7753A400A1D298 /* GeoChatAppIcon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 046605AB1A7753A400A1D298 /* GeoChatAppIcon@3x.png */; };
 		048074BB1A351983006DAD33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048074BA1A351983006DAD33 /* Security.framework */; };
 		048074FD1A353DC1006DAD33 /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074FC1A353DC1006DAD33 /* UserViewController.m */; };
 		048075011A3580D2006DAD33 /* ConstrainedTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074FF1A3580D2006DAD33 /* ConstrainedTableViewCell.m */; };
@@ -81,6 +83,8 @@
 		044927541A6F1CD90051C3AA /* GeoChatAPIManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatAPIManager.m; sourceTree = "<group>"; };
 		044A7FC81A359A2100EADA8A /* ChangeNicknameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChangeNicknameViewController.h; sourceTree = "<group>"; };
 		044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChangeNicknameViewController.m; sourceTree = "<group>"; };
+		046605AA1A7753A400A1D298 /* GeoChatAppIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GeoChatAppIcon@2x.png"; sourceTree = "<group>"; };
+		046605AB1A7753A400A1D298 /* GeoChatAppIcon@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "GeoChatAppIcon@3x.png"; sourceTree = "<group>"; };
 		048074BA1A351983006DAD33 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		048074FB1A353DC1006DAD33 /* UserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
 		048074FC1A353DC1006DAD33 /* UserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
@@ -247,6 +251,8 @@
 		04DBE9731A70781400B4392B /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				046605AA1A7753A400A1D298 /* GeoChatAppIcon@2x.png */,
+				046605AB1A7753A400A1D298 /* GeoChatAppIcon@3x.png */,
 				968310B21A4B6BEF006C5428 /* actions-ellipse.png */,
 				968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */,
 				968310B11A4B6BEF006C5428 /* actions-ellipse@3x.png */,
@@ -372,12 +378,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				96F597FF1A4FC9BB00414D05 /* System-settings-icon@2x.png in Resources */,
+				046605AC1A7753A400A1D298 /* GeoChatAppIcon@2x.png in Resources */,
 				048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */,
 				048075021A3580D2006DAD33 /* ConstrainedTableViewCell.xib in Resources */,
 				042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */,
 				042440ED1A2BE089004B0786 /* LaunchScreen.xib in Resources */,
 				042440EA1A2BE089004B0786 /* Images.xcassets in Resources */,
 				96AD7C141A4F75460019AF96 /* UserListViewController.xib in Resources */,
+				046605AD1A7753A400A1D298 /* GeoChatAppIcon@3x.png in Resources */,
 				96F597F81A4FC74B00414D05 /* RoomMapViewController.xib in Resources */,
 				0424410C1A2C0DBB004B0786 /* MasterViewController.xib in Resources */,
 				968310B41A4B6BEF006C5428 /* actions-ellipse@3x.png in Resources */,

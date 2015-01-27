@@ -12,6 +12,7 @@
 #import "MessagesViewController.h"
 #import "MasterViewController.h"
 #import "LoginViewController.h"
+#import "GeoChatAPIManager.h"
 
 #define IS_IOS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 
@@ -38,6 +39,7 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
     self.roomMapView.delegate = self;
+    self.roomMapView.showsUserLocation = YES;
 }
 
 - (void)addRoom
@@ -47,8 +49,7 @@
 
 - (void)viewSettings
 {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
-    //actionSheet.tintColor = [UIColor colorWithRed:20.0/255.0f green:204.0/255.0f blue:96.0/255.0f alpha:1.0f];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", @"Show list view", nil];
     [actionSheet showInView:self.view];
 }
 
@@ -75,18 +76,57 @@
     CLAuthorizationStatus locationServices = [CLLocationManager locationServicesEnabled];
     
     if (locationServices) {
-        if (IS_IOS_8_OR_LATER) {
-            [manager requestWhenInUseAuthorization];
+        if (status == kCLAuthorizationStatusNotDetermined) {
+            if (IS_IOS_8_OR_LATER) {
+                [manager requestWhenInUseAuthorization];
+            } else {
+                
+            }
+        } else if (status == kCLAuthorizationStatusDenied) {
+            [self alertViewWithTitle:@"Location Services denied" message:@"GeoChat needs to be able to use your location in order to find and create rooms." cancelButton:@"Got it" otherButtonTitles:@[@"Settings"] tag:201];
+        } else if (status == kCLAuthorizationStatusRestricted) {
+            [self alertViewWithTitle:@"Location Services restricted" message:@"Sorry, but your Location Services have been restricted! Please come back when Location Services are unrestricted." cancelButton:@"Okay :(" otherButtonTitles:nil tag:202];
+        } else {
+            NSLog(@"Already authorized...");
+            
         }
     } else {
         //Location services are not enabled...
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Location Services disabled" message:@"In order to use GeoChat, we must be able to use your location to find and create rooms around you. Please re-enable Location Services if you wish to continue to use GeoChat." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:@"Settings", nil];
-        alert.tag = 200;
-        [alert show];
+        [self alertViewWithTitle:@"Location Services disabled" message:@"In order to use GeoChat, we must be able to use your location to find and create rooms around you. Please re-enable Location Services if you wish to contiue to use GeoChat." cancelButton:@"Okay" otherButtonTitles:@[@"Settings"] tag:200];
     }
 }
 
 #pragma mark - Map view delegate methods
+
+- (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
+{
+    
+}
+
+#pragma mark - action sheet delegate methods
+
+- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    switch (buttonIndex) {
+        case 0: {
+            NSLog(@"Button 0...");
+        }
+            break;
+            
+        case 1: {
+            NSLog(@"Button 1...");
+            [self alertViewWithTitle:@"Logout" message:@"Are you sure?" cancelButton:@"Never mind" otherButtonTitles:@[@"Logout"] tag:203];
+        }
+            break;
+            
+        case 2: {
+            NSLog(@"Button 2...");
+        }
+            break;
+    }
+}
+
+#pragma mark - alert view delegate
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -96,6 +136,7 @@
             switch (buttonIndex) {
                 case 0: {
                     NSLog(@"Button 0...");
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
                 }
                     break;
                 
@@ -105,6 +146,49 @@
                     break;
             }
             
+        }
+            break;
+            
+        case 201: {
+            NSLog(@"201...");
+            switch (buttonIndex) {
+                case 0: {
+                    NSLog(@"");
+                    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+                }
+                    break;
+                    
+                case 1: {
+                    NSLog(@"");
+                }
+                    break;
+            }
+        }
+            break;
+            
+        case 202: {
+            NSLog(@"202");
+        }
+            break;
+            
+        case 203: {
+            NSLog(@"203");
+            switch (buttonIndex) {
+                case 0: {
+                    NSLog(@"No...");
+                }
+                    break;
+                    
+                case 1: {
+                    NSLog(@"But yes...");
+                    [[FBSession activeSession] closeAndClearTokenInformation];
+                    [[GeoChatAPIManager sharedManager] logout];
+                    LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
+                    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+                    [self presentViewController:navController animated:YES completion:nil];
+                }
+                    break;
+            }
         }
             break;
             

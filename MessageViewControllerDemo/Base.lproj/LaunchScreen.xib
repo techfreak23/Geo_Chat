@@ -10,21 +10,33 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to GeoChat!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SAB-um-wVg">
-                    <rect key="frame" x="72" y="91" width="337" height="42"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="GeoChat!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SAB-um-wVg">
+                    <rect key="frame" x="168" y="219" width="146" height="42"/>
                     <fontDescription key="fontDescription" type="system" pointSize="35"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="GeoChatAppIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="0tU-Ib-PUD">
+                    <rect key="frame" x="214" y="269" width="52" height="52"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="52" id="K1R-sM-pnR"/>
+                        <constraint firstAttribute="height" constant="52" id="jf7-NU-hDr"/>
+                    </constraints>
+                </imageView>
             </subviews>
             <color key="backgroundColor" red="0.15686274509803921" green="0.84313725490196079" blue="0.63137254901960782" alpha="1" colorSpace="calibratedRGB"/>
             <constraints>
-                <constraint firstItem="SAB-um-wVg" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="JT3-Rx-mpI"/>
-                <constraint firstItem="SAB-um-wVg" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="91" id="mwa-Da-OBP"/>
+                <constraint firstItem="SAB-um-wVg" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="168" id="JQh-f8-dhN"/>
+                <constraint firstItem="0tU-Ib-PUD" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="bHe-YN-oB2"/>
+                <constraint firstItem="0tU-Ib-PUD" firstAttribute="top" secondItem="SAB-um-wVg" secondAttribute="bottom" constant="8" symbolic="YES" id="pmD-44-ePZ"/>
+                <constraint firstItem="SAB-um-wVg" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="y6a-2M-0bU"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="548" y="455"/>
         </view>
     </objects>
+    <resources>
+        <image name="GeoChatAppIcon.png" width="60" height="60"/>
+    </resources>
 </document>
