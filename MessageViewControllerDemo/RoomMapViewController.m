@@ -109,6 +109,8 @@ BOOL locationFetched;
     self.roomNameField.borderStyle = UITextBorderStyleNone;
     self.roomNameField.tintColor = [UIColor blackColor];
     self.roomNameField.backgroundColor = [UIColor whiteColor];
+    self.roomNameField.placeholder = @"Room name";
+    self.roomNameField.returnKeyType = UIReturnKeyDone;
     self.roomNameField.textAlignment = NSTextAlignmentCenter;
     self.roomNameField.layer.cornerRadius = 10.0f;
     self.roomNameField.layer.masksToBounds = YES;
