@@ -7,6 +7,7 @@
 //
 
 #import <MapKit/MapKit.h>
+#import <QuartzCore/QuartzCore.h>
 #import "RoomMapViewController.h"
 #import "AddRoomViewController.h"
 #import "MessagesViewController.h"
@@ -16,13 +17,16 @@
 
 #define IS_IOS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 
-@interface RoomMapViewController () <MKMapViewDelegate, CLLocationManagerDelegate, UIAlertViewDelegate, UIActionSheetDelegate>
+@interface RoomMapViewController () <MKMapViewDelegate, CLLocationManagerDelegate, UIAlertViewDelegate, UIActionSheetDelegate, UITextFieldDelegate>
 
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, weak) IBOutlet MKMapView *roomMapView;
 @property (nonatomic, strong) NSMutableArray *roomItems;
+@property (nonatomic, strong) UITextField *roomNameField;
 
 @end
+
+BOOL locationFetched;
 
 @implementation RoomMapViewController
 
@@ -31,12 +35,20 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
+    locationFetched = NO;
+    
+    self.roomNameField = [[UITextField alloc] init];
+    
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
-    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];;
+    self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     
+    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshRooms)];
+    UIBarButtonItem *addRoomButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
+    
     self.navigationItem.title = @"GeoChat!";
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
+    [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
     self.roomMapView.delegate = self;
@@ -47,6 +59,8 @@
 {
     [super viewWillAppear:animated];
     
+    NSLog(@"Map view appearing...");
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRooms:) name:@"didFinishFetchingRooms" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
@@ -56,6 +70,7 @@
 {
     [super viewWillDisappear:animated];
     
+    NSLog(@"Map view disappearing...");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -63,7 +78,7 @@
 
 - (void)didFinishWithRooms:(NSNotification *)notification
 {
-    
+    NSLog(@"We've got the rooms...");
 }
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
@@ -73,17 +88,45 @@
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
-    
+    NSLog(@"We finished creating the room...");
 }
 
 #pragma mark - my methods
 
+- (void)fetchRooms
+{
+    NSLog(@"Fetching rooms...");
+    
+    CLLocation *location = self.locationManager.location;
+    NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
+    NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
+    [[GeoChatAPIManager sharedManager] fetchRoomsForLatitude:latitude longitude:longitude];
+}
+
 - (void)addRoom
 {
-    NSLog(@"Adding room...");
-    AddRoomViewController *controller = [[AddRoomViewController alloc] initWithNibName:@"AddRoomViewController" bundle:nil];
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
-    [self.navigationController presentViewController:navController animated:YES completion:nil];
+    self.roomNameField.delegate = self;
+    self.roomNameField.borderStyle = UITextBorderStyleNone;
+    self.roomNameField.tintColor = [UIColor blackColor];
+    self.roomNameField.backgroundColor = [UIColor whiteColor];
+    self.roomNameField.textAlignment = NSTextAlignmentCenter;
+    self.roomNameField.layer.cornerRadius = 10.0f;
+    self.roomNameField.layer.masksToBounds = YES;
+    self.navigationItem.titleView = self.roomNameField;
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAddRoom)];
+    UIBarButtonItem *createButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(createRoom)];
+    [self.navigationItem setRightBarButtonItems:@[createButton]];
+    
+    CGRect frame = self.navigationController.navigationBar.frame;
+    CGSize navSize = frame.size;
+    
+    self.roomNameField.frame = CGRectMake(frame.origin.x - createButton.width, frame.origin.y - 5, navSize.width, navSize.height - 10);
+    
+    self.navigationItem.titleView = self.roomNameField;
+    self.navigationItem.rightBarButtonItem.enabled = NO;
+    
+    
+    [self.roomNameField becomeFirstResponder];
 }
 
 - (void)viewSettings
@@ -92,12 +135,43 @@
     [actionSheet showInView:self.view];
 }
 
+- (void)refreshRooms
+{
+    [self updateLocation];
+}
+
+- (void)createRoom
+{
+    NSLog(@"Creating room...");
+    [self.roomNameField resignFirstResponder];
+    MKUserLocation *location = self.roomMapView.userLocation;
+    NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
+    NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
+    
+    [[GeoChatAPIManager sharedManager] createRoom:self.roomNameField.text latitude:latitude longitude:longitude];
+    
+    [self cancelAddRoom];
+}
+
+- (void)cancelAddRoom
+{
+    self.navigationItem.titleView = nil;
+    self.navigationItem.title = @"GeoChat!";
+    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshRooms)];
+    UIBarButtonItem *addRoomButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
+    
+    [self.roomNameField resignFirstResponder];
+    [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
+}
+
+
 - (void)updateLocation
 {
     MKUserLocation *userLocation = self.roomMapView.userLocation;
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
     [self.roomMapView setRegion:region animated:YES];
-
+    [self fetchRooms];
 }
 
 - (void)alertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton otherButtonTitles:(NSArray*)otherButtons tag:(NSInteger)tag
@@ -147,8 +221,43 @@
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
-    NSLog(@"User location: %@", userLocation);
-    [self updateLocation];
+    if (!locationFetched) {
+        NSLog(@"User location: %@", userLocation);
+        [self updateLocation];
+        locationFetched = YES;
+    }
+}
+
+#pragma mark - text field delegate methods
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    NSLog(@"The delegate is working...");
+    if (textField.text.length > 3) {
+        NSLog(@"The done button should be enabling...");
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+    }
+}
+
+- (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if (textField.text.length > 3) {
+        NSLog(@"The done button should be enabling...");
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+    }
+    
+    return YES;
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    if (textField.text.length > 3) {
+        NSLog(@"The done button should be enabling...");
+        self.navigationItem.rightBarButtonItem.enabled = YES;
+    }
+    [textField resignFirstResponder];
+    
+    return YES;
 }
 
 #pragma mark - action sheet delegate methods
@@ -227,17 +336,17 @@
             NSLog(@"Logging out...");
             switch (buttonIndex) {
                 case 0: {
-                    NSLog(@"No...");
-                }
-                    break;
-                    
-                case 1: {
                     NSLog(@"But yes...");
                     [[FBSession activeSession] closeAndClearTokenInformation];
                     [[GeoChatAPIManager sharedManager] logout];
                     LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
                     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
                     [self presentViewController:navController animated:NO completion:nil];
+                }
+                    break;
+                    
+                case 1: {
+                    NSLog(@"No...");
                 }
                     break;
                     

@@ -51,8 +51,6 @@ static NSString *reuseIdentifier = @"Cell";
     self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
     
-    self.view.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
-    
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
     [refresh addTarget:self action:@selector(fetchRooms) forControlEvents:UIControlEventValueChanged];
@@ -414,7 +412,7 @@ static NSString *reuseIdentifier = @"Cell";
             
             switch (buttonIndex) {
                 case 0: {
-                    NSLog(@"Button 0...");
+                    NSLog(@"Logging out...");
                     [[FBSession activeSession] closeAndClearTokenInformation];
                     [[GeoChatAPIManager sharedManager] logout];
                     LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
