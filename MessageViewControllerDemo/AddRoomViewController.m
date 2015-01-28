@@ -170,16 +170,6 @@
             self.locationLabel.textAlignment = NSTextAlignmentCenter;
             self.locationLabel.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.60f];
             
-            /*
-            self.updateButton = [[UIButton alloc] initWithFrame:CGRectMake(self.locationLabel.frame.size.width, self.locationLabel.frame.origin.y, self.locationLabel.frame.size.width, self.locationLabel.frame.size.height)];
-            self.updateButton.translatesAutoresizingMaskIntoConstraints = NO;
-            [self.updateButton addTarget:self action:@selector(updateLocation) forControlEvents:UIControlEventTouchUpInside];
-            self.updateButton.titleLabel.textColor = [UIColor blackColor];
-            [self.updateButton setTitle:@"Update location" forState:UIControlStateNormal];
-            self.updateButton.backgroundColor = [UIColor purpleColor];
-            */
-            
-            //[cell.contentView addSubview:self.updateButton];
             [cell.contentView addSubview:self.locationLabel];
         }
             break;

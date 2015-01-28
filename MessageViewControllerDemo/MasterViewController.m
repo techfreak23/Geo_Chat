@@ -66,7 +66,7 @@ static NSString *reuseIdentifier = @"Cell";
     CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
     CGFloat combHeight = statusHeight + navHeight;
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(200.0, 200.0, (frame.size.width)/2, (frame.size.height - combHeight)/2)];
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake((frame.size.width)/2, (frame.size.height - combHeight)/2, 100.0, 100.0)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     
     self.locationManager = [[CLLocationManager alloc] init];
