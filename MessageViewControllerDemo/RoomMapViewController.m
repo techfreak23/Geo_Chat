@@ -79,6 +79,7 @@ BOOL locationFetched;
 - (void)didFinishWithRooms:(NSNotification *)notification
 {
     NSLog(@"We've got the rooms...");
+    self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
 }
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
@@ -115,7 +116,7 @@ BOOL locationFetched;
     self.roomNameField.layer.cornerRadius = 10.0f;
     self.roomNameField.layer.masksToBounds = YES;
     self.navigationItem.titleView = self.roomNameField;
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelAddRoom)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemStop target:self action:@selector(cancelAddRoom)];
     UIBarButtonItem *createButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(createRoom)];
     [self.navigationItem setRightBarButtonItems:@[createButton]];
     
@@ -162,6 +163,7 @@ BOOL locationFetched;
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshRooms)];
     UIBarButtonItem *addRoomButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
     
+    self.roomNameField.text = @"";
     [self.roomNameField resignFirstResponder];
     [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
@@ -174,6 +176,20 @@ BOOL locationFetched;
     MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
     [self.roomMapView setRegion:region animated:YES];
     [self fetchRooms];
+}
+
+- (NSMutableArray *)createAnnotations:(NSArray *)locations
+{
+    NSMutableArray *temp = [@[] mutableCopy];
+    
+    for (NSDictionary *room in locations) {
+        NSString *latitude = [room objectForKey:@"latitude"];
+        NSString *longitude = [room objectForKey:@"longitude"];
+        NSString *title = [room objectForKey:@"name"];
+        
+    }
+    
+    return temp;
 }
 
 - (void)alertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton otherButtonTitles:(NSArray*)otherButtons tag:(NSInteger)tag

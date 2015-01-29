@@ -58,6 +58,7 @@ static NSString *reuseIdentifier = @"Cell";
     
     self.tableView.scrollEnabled = NO;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.90f];
     
     CGRect frame = [[UIScreen mainScreen] bounds];
     CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
@@ -75,6 +76,7 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    NSLog(@"Adding master observer...");
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRooms:) name:@"didFinishFetchingRooms" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
@@ -84,6 +86,7 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
+    NSLog(@"Removing master observer...");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -91,6 +94,33 @@ static NSString *reuseIdentifier = @"Cell";
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+#pragma notification methods
+
+- (void)didFinishWithRooms:(NSNotification *)notification
+{
+    NSLog(@"Did finish with rooms notif...");
+    self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    [self.indicatorView stopAnimating];
+    self.tableView.scrollEnabled = YES;
+    [self stopRefresh];
+    [self.tableView reloadData];
+    
+}
+
+- (void)didFinishCreatingRoom:(NSNotification *)notification
+{
+    NSLog(@"Did finish creating room notif...");
+}
+
+- (void)didFinishWithRoomInfo:(NSNotification *)notification
+{
+    NSLog(@"Did finish room info notif...");
+    MessagesViewController *controller = [[MessagesViewController alloc] init];
+    controller.roomInfo = (NSMutableDictionary *)[notification object];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 #pragma mark - My methods
@@ -124,8 +154,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)fetchRooms
 {
-    NSLog(@"Fetching rooms...");
-    
     CLLocation *location = self.locationManager.location;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
@@ -134,7 +162,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)addRoom
 {
-    NSLog(@"Adding room...");
     AddRoomViewController *controller = [[AddRoomViewController alloc] initWithNibName:@"AddRoomViewController" bundle:nil];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
     [self.navigationController presentViewController:navController animated:YES completion:nil];
@@ -142,7 +169,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)viewSettings
 {
-    
     UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
     actionSheet.tintColor = [UIColor colorWithRed:20.0/255.0f green:204.0/255.0f blue:96.0/255.0f alpha:1.0f];
     [actionSheet showInView:self.view];
@@ -153,33 +179,6 @@ static NSString *reuseIdentifier = @"Cell";
     self.roomItems = nil;
     self.tableView.scrollEnabled = NO;
     [self.tableView reloadData];
-}
-
-#pragma notification methods
-
-- (void)didFinishWithRooms:(NSNotification *)notification
-{
-    NSLog(@"Did finish with rooms notif...");
-    self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    [self.indicatorView stopAnimating];
-    self.tableView.scrollEnabled = YES;
-    [self stopRefresh];
-    [self.tableView reloadData];
-
-}
-
-- (void)didFinishCreatingRoom:(NSNotification *)notification
-{
-    NSLog(@"Did finish creating room notif...");
-}
-
-- (void)didFinishWithRoomInfo:(NSNotification *)notification
-{
-    NSLog(@"Did finish room info notif...");
-    MessagesViewController *controller = [[MessagesViewController alloc] init];
-    controller.roomInfo = (NSMutableDictionary *)[notification object];
-    [self.navigationController pushViewController:controller animated:YES];
 }
 
 #pragma mark - Table view data source

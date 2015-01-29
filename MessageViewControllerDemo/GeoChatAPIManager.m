@@ -73,7 +73,7 @@ dispatch_queue_t kBgQueue;
 {
     dispatch_async(kBgQueue, ^{
         [self.operationManager GET:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-            NSLog(@"Did finish GET with object: %@", responseObject);
+            //NSLog(@"Did finish GET with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish GET with error: %@", error.description);
@@ -87,7 +87,7 @@ dispatch_queue_t kBgQueue;
 {
     dispatch_async(kBgQueue, ^{
         [self.operationManager POST:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-            NSLog(@"Did finish POST with object: %@", responseObject);
+            //NSLog(@"Did finish POST with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish POST with error: %@", error.description);
@@ -196,7 +196,7 @@ dispatch_queue_t kBgQueue;
         NSLog(@"Use was in the room so now we fetch room info...");
         [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responeItem, NSError *error) {
             if (!error) {
-                NSLog(@"Finished fetching room with response item: %@", responeItem);
+                //NSLog(@"Finished fetching room with response item: %@", responeItem);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishRoomInfo" object:responeItem];
                 });

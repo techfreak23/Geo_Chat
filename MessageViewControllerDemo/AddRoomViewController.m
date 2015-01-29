@@ -157,7 +157,7 @@
             self.roomNameField.placeholder = @"Room name";
             self.roomNameField.delegate = self;
             self.roomNameField.tintColor = [UIColor whiteColor];
-            self.roomNameField.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.60f];
+            self.roomNameField.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.40f];
             [cell.contentView addSubview:self.roomNameField];
         }
             break;
@@ -168,7 +168,7 @@
             self.locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
             self.locationLabel.text = @"Getting location...";
             self.locationLabel.textAlignment = NSTextAlignmentCenter;
-            self.locationLabel.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.60f];
+            self.locationLabel.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.40f];
             
             [cell.contentView addSubview:self.locationLabel];
         }
