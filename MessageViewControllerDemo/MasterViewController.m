@@ -22,7 +22,7 @@
 #define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 #define IS_IOS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 
-@interface MasterViewController () <CLLocationManagerDelegate, UIActionSheetDelegate, UIAlertViewDelegate>
+@interface MasterViewController () <CLLocationManagerDelegate, UIActionSheetDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
 
 @property (nonatomic, strong) NSMutableArray *roomItems;
 @property (nonatomic, strong) CLLocationManager *locationManager;
@@ -50,6 +50,7 @@ static NSString *reuseIdentifier = @"Cell";
     
     self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+    self.navigationController.delegate = self;
     
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
@@ -77,23 +78,37 @@ static NSString *reuseIdentifier = @"Cell";
 {
     [super viewWillAppear:animated];
     NSLog(@"Adding master observer...");
+    
+    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishCreatingRoom" object:nil];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRooms:) name:@"didFinishFetchingRooms" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishRoomInfo" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishDeletingRoom) name:@"deleteWasSuccessful" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(cannotDeleteRoom) name:@"deleteWasUnsuccessful" object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
     NSLog(@"Removing master observer...");
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishFetchingRooms" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishRoomInfo" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"deleteWasSuccessful" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"deleteWasUnsuccessful" object:nil];
 }
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+    NSLog(@"Shown view controller: %@", [viewController class]);
 }
 
 #pragma notification methods
@@ -113,6 +128,11 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
     NSLog(@"Did finish creating room notif...");
+    [self.navigationController dismissViewControllerAnimated:YES completion:^{
+        MessagesViewController *controller = [[MessagesViewController alloc] init];
+        controller.roomInfo = (NSMutableDictionary *)[notification object];
+        [self.navigationController pushViewController:controller animated:YES];
+    }];
 }
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
@@ -121,6 +141,20 @@ static NSString *reuseIdentifier = @"Cell";
     MessagesViewController *controller = [[MessagesViewController alloc] init];
     controller.roomInfo = (NSMutableDictionary *)[notification object];
     [self.navigationController pushViewController:controller animated:YES];
+}
+
+- (void)didFinishDeletingRoom
+{
+    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+    [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+}
+
+- (void)cannotDeleteRoom
+{
+    NSLog(@"User is not authorized to delete room...");
+    NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [self showAlertViewWithTitle:@"Unauthorized" message:@"You must be the adminstrator of a room to delete it." cancelButton:@"Got it"];
 }
 
 #pragma mark - My methods
@@ -154,6 +188,7 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)fetchRooms
 {
+    [self.refreshControl beginRefreshing];
     CLLocation *location = self.locationManager.location;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
@@ -162,6 +197,8 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)addRoom
 {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
+    
     AddRoomViewController *controller = [[AddRoomViewController alloc] initWithNibName:@"AddRoomViewController" bundle:nil];
     UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
     [self.navigationController presentViewController:navController animated:YES completion:nil];
@@ -242,6 +279,20 @@ static NSString *reuseIdentifier = @"Cell";
     [UIView animateWithDuration:0.25 animations:^ {
         cell.contentView.layer.opacity = 1.0;
     }];
+}
+
+- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return YES;
+}
+
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSDictionary *temp = (NSDictionary *)[self.roomItems objectAtIndex:indexPath.row];
+        NSString *roomID = (NSString *)[temp objectForKey:@"id"];
+        [[GeoChatAPIManager sharedManager] deleteRoom:roomID];
+    }
 }
 
 #pragma  mark - location manager delegate methods

@@ -9,6 +9,7 @@
 #import <MapKit/MapKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "RoomMapViewController.h"
+#import "RoomMapAnnotation.h"
 #import "AddRoomViewController.h"
 #import "MessagesViewController.h"
 #import "MasterViewController.h"
@@ -49,6 +50,7 @@ BOOL locationFetched;
     
     self.navigationItem.title = @"GeoChat!";
     [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
     
     self.roomMapView.delegate = self;
@@ -80,16 +82,22 @@ BOOL locationFetched;
 {
     NSLog(@"We've got the rooms...");
     self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
+    [self createAnnotations];
 }
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
 {
-    
+    MessagesViewController *controller = [[MessagesViewController alloc] init];
+    controller.roomInfo = (NSMutableDictionary *)[notification object];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
-    NSLog(@"We finished creating the room...");
+    NSLog(@"We finished creating the room: %@", [notification object]);
+    MessagesViewController *controller = [[MessagesViewController alloc] init];
+    controller.roomInfo = (NSMutableDictionary *)[notification object];
+    [self.navigationController pushViewController:controller animated:YES];
 }
 
 #pragma mark - my methods
@@ -98,9 +106,12 @@ BOOL locationFetched;
 {
     NSLog(@"Fetching rooms...");
     
-    CLLocation *location = self.locationManager.location;
+    MKUserLocation *location = self.roomMapView.userLocation;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
+    
+    NSLog(@"Location for fetch: %@, %@", latitude, longitude);
+    
     [[GeoChatAPIManager sharedManager] fetchRoomsForLatitude:latitude longitude:longitude];
 }
 
@@ -124,9 +135,13 @@ BOOL locationFetched;
     CGSize navSize = frame.size;
     
     self.roomNameField.frame = CGRectMake(frame.origin.x - createButton.width, frame.origin.y - 5, navSize.width, navSize.height - 10);
-    
+    self.roomNameField.layer.opacity = 0.0f;
     self.navigationItem.titleView = self.roomNameField;
     self.navigationItem.rightBarButtonItem.enabled = NO;
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        self.roomNameField.layer.opacity = 1.0;
+    }];
     
     
     [self.roomNameField becomeFirstResponder];
@@ -146,8 +161,10 @@ BOOL locationFetched;
 - (void)createRoom
 {
     NSLog(@"Creating room...");
+    
     [self.roomNameField resignFirstResponder];
     MKUserLocation *location = self.roomMapView.userLocation;
+    
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
     
@@ -158,38 +175,70 @@ BOOL locationFetched;
 
 - (void)cancelAddRoom
 {
-    self.navigationItem.titleView = nil;
-    self.navigationItem.title = @"GeoChat!";
-    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshRooms)];
-    UIBarButtonItem *addRoomButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
-    
-    self.roomNameField.text = @"";
-    [self.roomNameField resignFirstResponder];
-    [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
+    [UIView animateWithDuration:0.3 animations:^{
+        self.roomNameField.layer.opacity = 0.0f;
+    } completion:^(BOOL finished) {
+        if (finished) {
+            [UIView animateWithDuration:0.3 animations:^{
+                UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshRooms)];
+                UIBarButtonItem *addRoomButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
+                
+                self.roomNameField.text = @"";
+                [self.roomNameField resignFirstResponder];
+                [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
+                self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
+                
+            } completion:^(BOOL finished) {
+                if (finished) {
+                    self.navigationItem.titleView = nil;
+                    self.navigationItem.title = @"GeoChat!";
+                }
+            }];
+        }
+    }];
 }
 
 
 - (void)updateLocation
 {
     MKUserLocation *userLocation = self.roomMapView.userLocation;
-    MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
-    [self.roomMapView setRegion:region animated:YES];
+    NSLog(@"User location: %@", userLocation);
+    //MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
+    //[self.roomMapView setRegion:region animated:YES];
     [self fetchRooms];
 }
 
-- (NSMutableArray *)createAnnotations:(NSArray *)locations
+- (void)createAnnotations
 {
     NSMutableArray *temp = [@[] mutableCopy];
     
-    for (NSDictionary *room in locations) {
-        NSString *latitude = [room objectForKey:@"latitude"];
-        NSString *longitude = [room objectForKey:@"longitude"];
-        NSString *title = [room objectForKey:@"name"];
+    for (NSDictionary *room in self.roomItems) {
+        NSLog(@"Room info: %@", room);
+        CGFloat latitude = [[room objectForKey:@"latitude"] floatValue];
+        CGFloat longitude = [[room objectForKey:@"longitude"] floatValue];
         
+        NSLog(@"Latitude: %f Longitude: %f", latitude, longitude);
+        
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(latitude, longitude);
+        
+        RoomMapAnnotation *point = [[RoomMapAnnotation alloc] init];
+        point.title = [room objectForKey:@"name"];
+        point.subtitle = [NSString stringWithFormat:@"Distance: %0.2f", [[room objectForKey:@"distance"] floatValue]];
+        point.coordinate = coordinate;
+        point.roomID = [room objectForKey:@"id"];
+        
+        [temp addObject:point];
     }
     
-    return temp;
+    [self.roomMapView addAnnotations:temp];
+    [self.roomMapView showAnnotations:temp animated:YES];
+    
+    NSLog(@"About to add annontations to map view...");
+}
+
+- (void)makeNewMapRegion:(NSMutableArray *)locations
+{
+    
 }
 
 - (void)alertViewWithTitle:(NSString *)title message:(NSString *)message cancelButton:(NSString *)cancelButton otherButtonTitles:(NSArray*)otherButtons tag:(NSInteger)tag
@@ -239,11 +288,51 @@ BOOL locationFetched;
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
+    NSLog(@"User location: %@", userLocation);
     if (!locationFetched) {
-        NSLog(@"User location: %@", userLocation);
-        [self updateLocation];
         locationFetched = YES;
+        [self updateLocation];
     }
+}
+
+- (void)mapViewDidStopLocatingUser:(MKMapView *)mapView
+{
+    NSLog(@"Location tracking ended...");
+}
+
+- (MKAnnotationView *)mapView:(MKMapView *)mapView viewForAnnotation:(id<MKAnnotation>)annotation
+{
+    static NSString *reuseIdentifier = @"annotationView";
+    
+    if ([annotation isKindOfClass:[MKUserLocation class]])
+        return nil;
+    
+    MKPinAnnotationView *annView = annView = [[MKPinAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
+    annView.pinColor = MKPinAnnotationColorGreen;
+    annView.rightCalloutAccessoryView = [UIButton buttonWithType:UIButtonTypeDetailDisclosure];
+    //annView.animatesDrop = YES;
+    annView.canShowCallout = YES;
+    
+    return annView;
+}
+
+- (void)mapView:(MKMapView *)mapView didSelectAnnotationView:(MKAnnotationView *)view
+{
+    NSLog(@"Selected annotation: %@", view.annotation);
+}
+
+- (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
+{
+    NSLog(@"Control: %@ for view: %@", control, view);
+    NSLog(@"Annotation details: %@", view.annotation);
+    RoomMapAnnotation *tempAnn = (RoomMapAnnotation *)view.annotation;
+    NSLog(@"Title: %@ room id: %@", tempAnn.title, tempAnn.roomID);
+    [[GeoChatAPIManager sharedManager] fetchRoomForID:tempAnn.roomID];
+}
+
+- (void)mapView:(MKMapView *)mapView didAddAnnotationViews:(NSArray *)views
+{
+   //NSLog(@"Did add annotations: %@", views);
 }
 
 #pragma mark - text field delegate methods

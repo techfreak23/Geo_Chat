@@ -37,6 +37,8 @@
 		048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */; };
 		048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */; };
 		048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7491A2D9565004E20BE /* GeoChatUser.m */; };
+		049B87741A7A113A00B05EC7 /* RoomMapAnnotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 049B87731A7A113A00B05EC7 /* RoomMapAnnotation.m */; };
+		049B87771A7A115F00B05EC7 /* RoomMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 049B87761A7A115F00B05EC7 /* RoomMapViewController.m */; };
 		381F53ADBFB305A8851901A3 /* libPods-MessageViewControllerDemo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1608F6913E34230E3B0B89D /* libPods-MessageViewControllerDemo.a */; };
 		965108491A3945DA00AACBFE /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 965108481A3945DA00AACBFE /* FacebookSDK.framework */; };
 		968310B31A4B6BEF006C5428 /* actions-ellipse@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 968310B01A4B6BEF006C5428 /* actions-ellipse@2x.png */; };
@@ -44,7 +46,6 @@
 		968310B51A4B6BEF006C5428 /* actions-ellipse.png in Resources */ = {isa = PBXBuildFile; fileRef = 968310B21A4B6BEF006C5428 /* actions-ellipse.png */; };
 		96AD7C131A4F75460019AF96 /* UserListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96AD7C111A4F75460019AF96 /* UserListViewController.m */; };
 		96AD7C141A4F75460019AF96 /* UserListViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96AD7C121A4F75460019AF96 /* UserListViewController.xib */; };
-		96F597F71A4FC74B00414D05 /* RoomMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 96F597F51A4FC74B00414D05 /* RoomMapViewController.m */; };
 		96F597F81A4FC74B00414D05 /* RoomMapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96F597F61A4FC74B00414D05 /* RoomMapViewController.xib */; };
 		96F597FE1A4FC9BB00414D05 /* System-settings-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 96F597FB1A4FC9BB00414D05 /* System-settings-icon.png */; };
 		96F597FF1A4FC9BB00414D05 /* System-settings-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 96F597FC1A4FC9BB00414D05 /* System-settings-icon@2x.png */; };
@@ -108,6 +109,10 @@
 		048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddRoomViewController.xib; sourceTree = "<group>"; };
 		048CF7481A2D9565004E20BE /* GeoChatUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GeoChatUser.h; sourceTree = "<group>"; };
 		048CF7491A2D9565004E20BE /* GeoChatUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeoChatUser.m; sourceTree = "<group>"; };
+		049B87721A7A113A00B05EC7 /* RoomMapAnnotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoomMapAnnotation.h; sourceTree = "<group>"; };
+		049B87731A7A113A00B05EC7 /* RoomMapAnnotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoomMapAnnotation.m; sourceTree = "<group>"; };
+		049B87751A7A115F00B05EC7 /* RoomMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoomMapViewController.h; sourceTree = "<group>"; };
+		049B87761A7A115F00B05EC7 /* RoomMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoomMapViewController.m; sourceTree = "<group>"; };
 		04F4A1521A5A268C0001CAA3 /* GeoChatAPNSs.mobileprovision */ = {isa = PBXFileReference; lastKnownFileType = file; path = GeoChatAPNSs.mobileprovision; sourceTree = "<group>"; };
 		37B346F6D6D9DC5838E55144 /* Pods-MessageViewControllerDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MessageViewControllerDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-MessageViewControllerDemo/Pods-MessageViewControllerDemo.release.xcconfig"; sourceTree = "<group>"; };
 		965108481A3945DA00AACBFE /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../Documents/FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
@@ -117,8 +122,6 @@
 		96AD7C101A4F75460019AF96 /* UserListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserListViewController.h; sourceTree = "<group>"; };
 		96AD7C111A4F75460019AF96 /* UserListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserListViewController.m; sourceTree = "<group>"; };
 		96AD7C121A4F75460019AF96 /* UserListViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = UserListViewController.xib; sourceTree = "<group>"; };
-		96F597F41A4FC74B00414D05 /* RoomMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoomMapViewController.h; sourceTree = "<group>"; };
-		96F597F51A4FC74B00414D05 /* RoomMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoomMapViewController.m; sourceTree = "<group>"; };
 		96F597F61A4FC74B00414D05 /* RoomMapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RoomMapViewController.xib; sourceTree = "<group>"; };
 		96F597FB1A4FC9BB00414D05 /* System-settings-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "System-settings-icon.png"; sourceTree = "<group>"; };
 		96F597FC1A4FC9BB00414D05 /* System-settings-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "System-settings-icon@2x.png"; sourceTree = "<group>"; };
@@ -207,9 +210,11 @@
 				0421F2C61A30544500FCAB04 /* MessagesViewController.m */,
 				0421F2CD1A314D4300FCAB04 /* ProfileViewController.h */,
 				0421F2CE1A314D4300FCAB04 /* ProfileViewController.m */,
-				96F597F41A4FC74B00414D05 /* RoomMapViewController.h */,
-				96F597F51A4FC74B00414D05 /* RoomMapViewController.m */,
+				049B87751A7A115F00B05EC7 /* RoomMapViewController.h */,
+				049B87761A7A115F00B05EC7 /* RoomMapViewController.m */,
 				96F597F61A4FC74B00414D05 /* RoomMapViewController.xib */,
+				049B87721A7A113A00B05EC7 /* RoomMapAnnotation.h */,
+				049B87731A7A113A00B05EC7 /* RoomMapAnnotation.m */,
 				96AD7C101A4F75460019AF96 /* UserListViewController.h */,
 				96AD7C111A4F75460019AF96 /* UserListViewController.m */,
 				96AD7C121A4F75460019AF96 /* UserListViewController.xib */,
@@ -467,16 +472,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96F597F71A4FC74B00414D05 /* RoomMapViewController.m in Sources */,
 				044927551A6F1CD90051C3AA /* GeoChatAPIManager.m in Sources */,
 				048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */,
 				042441101A2C0E00004B0786 /* LoginViewController.m in Sources */,
 				0421F2C71A30544500FCAB04 /* MessagesViewController.m in Sources */,
+				049B87741A7A113A00B05EC7 /* RoomMapAnnotation.m in Sources */,
 				048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */,
 				042440E21A2BE089004B0786 /* AppDelegate.m in Sources */,
 				044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */,
 				0421F2CF1A314D4300FCAB04 /* ProfileViewController.m in Sources */,
 				048075011A3580D2006DAD33 /* ConstrainedTableViewCell.m in Sources */,
+				049B87771A7A115F00B05EC7 /* RoomMapViewController.m in Sources */,
 				96AD7C131A4F75460019AF96 /* UserListViewController.m in Sources */,
 				0424410B1A2C0DBB004B0786 /* MasterViewController.m in Sources */,
 				042440DF1A2BE089004B0786 /* main.m in Sources */,

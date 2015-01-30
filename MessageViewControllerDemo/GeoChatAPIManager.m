@@ -55,7 +55,6 @@ dispatch_queue_t kBgQueue;
         _operationManager = [[AFHTTPRequestOperationManager alloc] initWithBaseURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@", kGeoChatEndpoint]]];
         _operationManager.completionQueue = kBgQueue;
         _operationManager.requestSerializer = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
-        _operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
         _joinedRooms = [@[] mutableCopy];
     }
     
@@ -72,6 +71,7 @@ dispatch_queue_t kBgQueue;
 - (void)sendGETForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
+        self.operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
         [self.operationManager GET:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             //NSLog(@"Did finish GET with object: %@", responseObject);
             handler(responseObject, nil);
@@ -86,6 +86,7 @@ dispatch_queue_t kBgQueue;
 - (void)sendPOSTForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
+        self.operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
         [self.operationManager POST:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             //NSLog(@"Did finish POST with object: %@", responseObject);
             handler(responseObject, nil);
@@ -112,6 +113,7 @@ dispatch_queue_t kBgQueue;
 - (void)sendDELETEForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
+        self.operationManager.responseSerializer = [AFHTTPResponseSerializer serializer];
         [self.operationManager DELETE:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish DELETE with object: %@", responseObject);
             handler(responseObject, nil);
@@ -189,7 +191,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)fetchRoomForID:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"%@/api/v1/chat_room", kGeoChatEndpoint];
+    NSString *baseURL = [NSString stringWithFormat:@"api/v1/chat_room"];
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     if ([self checkID:roomID]) {
@@ -212,7 +214,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)createRoom:(NSString *)name latitude:(NSString *)latitude longitude:(NSString *)longitude
 {
-    NSString *baseURL = [NSString stringWithFormat:@"%@/api/v1/chat_rooms/create", kGeoChatEndpoint];
+    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_rooms/create"];
     NSDictionary *parameters = @{@"access_token": AccessToken, @"chat_room": @{@"name": name, @"latitude": latitude, @"longitude": longitude}};
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -230,9 +232,30 @@ dispatch_queue_t kBgQueue;
     }];
 }
 
+- (void)deleteRoom:(NSString *)roomID
+{
+    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_room"];
+    NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
+    
+    NSLog(@"Attempting to delete room...");
+    
+    [self sendDELETEForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
+        if (!error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"deleteWasSuccessful" object:nil];
+            });
+        } else {
+            NSLog(@"Something went wrong with deleting the room: %@", error.description);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"deleteWasUnsuccessful" object:nil];
+            });
+        }
+    }];
+}
+
 - (void)addUserToRoom:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"%@/api/v1/chat_room/add_user", kGeoChatEndpoint];
+    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_room/add_user"];
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -263,7 +286,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)sendMessage:(NSString *)content room:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"%@/api/v1/chat_room/send_message", kGeoChatEndpoint];
+    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_room/send_message"];
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID, @"message": @{@"content": content}};
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -281,7 +304,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)fetchUserRoomList
 {
-    NSString *baseURL = [NSString stringWithFormat:@"%@/api/v1/user/chat_rooms", kGeoChatEndpoint];
+    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/user/chat_rooms"];
     NSDictionary *parameters = @{@"access_token" : AccessToken};
     
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {

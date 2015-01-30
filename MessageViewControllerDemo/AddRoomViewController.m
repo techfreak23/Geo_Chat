@@ -22,6 +22,8 @@
 
 @end
 
+BOOL locationFetched;
+
 @implementation AddRoomViewController
 
 - (void)viewDidLoad
@@ -29,8 +31,9 @@
     [super viewDidLoad];
     
     self.menuItems = @[@"Text field view", @"Location view", @"Map view"];
+    locationFetched = NO;
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRoomWithError:) name:@"didFinishRoomWithError" object:nil];
     
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
@@ -75,16 +78,6 @@
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
     
     [[GeoChatAPIManager sharedManager] createRoom:self.roomNameField.text latitude:latitude longitude:longitude];
-}
-
-- (void)didFinishCreatingRoom:(NSNotification *)notification
-{
-    NSLog(@"Did finish creating room: %@", [notification object]);
-    [self.roomNameField resignFirstResponder];
-    [self.presentingViewController dismissViewControllerAnimated:YES completion: ^{
-        NSLog(@"Dismissed add room view with completion...");
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishAddingRoom" object:[notification object]];
-    }];
 }
 
 - (void)didFinishRoomWithError:(NSNotification *)notification
@@ -157,7 +150,7 @@
             self.roomNameField.placeholder = @"Room name";
             self.roomNameField.delegate = self;
             self.roomNameField.tintColor = [UIColor whiteColor];
-            self.roomNameField.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.40f];
+            self.roomNameField.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.30f];
             [cell.contentView addSubview:self.roomNameField];
         }
             break;
@@ -168,7 +161,7 @@
             self.locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
             self.locationLabel.text = @"Getting location...";
             self.locationLabel.textAlignment = NSTextAlignmentCenter;
-            self.locationLabel.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.40f];
+            self.locationLabel.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.30f];
             
             [cell.contentView addSubview:self.locationLabel];
         }
@@ -254,7 +247,13 @@
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
     NSLog(@"%s: %@", __PRETTY_FUNCTION__, userLocation);
-    [self updateLocation];
+    if (!locationFetched) {
+        NSLog(@"Location has not been fetched yet...");
+        locationFetched = YES;
+        [self updateLocation];
+    } else {
+        NSLog(@"The user's location is already fetched...");
+    }
 }
 
 - (void)mapView:(MKMapView *)mapView regionDidChangeAnimated:(BOOL)animated
