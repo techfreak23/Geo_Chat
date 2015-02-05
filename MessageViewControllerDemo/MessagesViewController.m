@@ -39,8 +39,12 @@
     NSLog(@"Room info: %@", self.roomInfo);
     
     self.messages = [self.roomInfo objectForKey:@"messages"];
+    NSLog(@"Room messages: %@", self.messages);
     
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actions-ellipse"] style:UIBarButtonItemStylePlain target:self action:@selector(showOptions)];
+    UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actions-ellipse"] style:UIBarButtonItemStylePlain target:self action:@selector(showOptions)];
+    UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshMessages)];
+    [self.navigationItem setRightBarButtonItems:@[menuButton, refreshButton] animated:YES];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     
     //[self createJSQMessages];
 }
@@ -86,13 +90,27 @@
     }
 }
 
+- (void)refreshMessages
+{
+    NSLog(@"Refreshing messages....");
+    
+    [[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:@""];
+}
 
+#pragma mark - notification methods
 
 - (void)didFinishSendingWithSuccess:(NSNotification *)notification
 {
     NSLog(@"Did finish with success!: %@", notification.description);
     [JSQSystemSoundPlayer jsq_playMessageSentSound];
-    [self finishSendingMessage];
+    [self finishSendingMessageAnimated:YES];
+}
+
+- (void)didFinishPolling:(NSNotification *)notification
+{
+    NSLog(@"Did finish with new messages: %@", [notification object]);
+    [JSQSystemSoundPlayer jsq_playMessageReceivedSound];
+    [self finishReceivingMessageAnimated:YES];
 }
 
 #pragma mark - 

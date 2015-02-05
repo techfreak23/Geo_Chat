@@ -231,7 +231,7 @@ BOOL locationFetched;
     }
     
     [self.roomMapView addAnnotations:temp];
-    [self.roomMapView showAnnotations:temp animated:YES];
+    [self.roomMapView showAnnotations:temp animated:NO];
     
     NSLog(@"About to add annontations to map view...");
 }

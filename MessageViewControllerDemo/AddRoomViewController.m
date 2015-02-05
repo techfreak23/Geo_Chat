@@ -84,7 +84,7 @@ BOOL locationFetched;
 {
     NSLog(@"There was an error...");
     
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops!" message:@"Something went wrong with creating the room :(" delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"We're sorry" message:@"Your room could not be created at this time. Try again later." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
     [alert show];
 }
 

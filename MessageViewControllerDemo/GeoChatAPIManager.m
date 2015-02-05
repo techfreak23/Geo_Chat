@@ -302,6 +302,20 @@ dispatch_queue_t kBgQueue;
     
 }
 
+- (void)fetchNewMessagesForRoom:(NSString *)roomID messageIndex:(NSString *)index
+{
+    NSString *baseURL = @"/api/v1/chat_room/retrieve_messages";
+    NSDictionary *parameters = @{@"access_token":AccessToken, @"id":roomID, @"index":index};
+    
+    [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error ) {
+        if (!error) {
+            NSLog(@"Response item for new messages: %@", responseItem);
+        } else {
+            NSLog(@"There was an error fetching the new messages...");
+        }
+    }];
+}
+
 - (void)fetchUserRoomList
 {
     NSString *baseURL = [NSString stringWithFormat:@"/api/v1/user/chat_rooms"];

@@ -21,5 +21,6 @@
 - (void)createRoom:(NSString *)name latitude:(NSString *)latitude longitude:(NSString *)longitude;
 - (void)deleteRoom:(NSString *)roomID;
 - (void)sendMessage:(NSString *)content room:(NSString *)roomID;
+- (void)fetchNewMessagesForRoom:(NSString *)roomID messageIndex:(NSString *)index;
 
 @end
