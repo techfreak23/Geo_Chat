@@ -94,7 +94,7 @@
 {
     NSLog(@"Refreshing messages....");
     
-    [[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:@""];
+    //[[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:@""];
 }
 
 #pragma mark - notification methods

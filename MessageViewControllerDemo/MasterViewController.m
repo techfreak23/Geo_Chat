@@ -146,7 +146,8 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)didFinishDeletingRoom
 {
     NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-    [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+    [self.roomItems removeObjectAtIndex:indexPath.row];
+    //[self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
 }
 
 - (void)cannotDeleteRoom
