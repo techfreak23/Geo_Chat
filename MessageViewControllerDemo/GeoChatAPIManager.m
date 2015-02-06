@@ -175,7 +175,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)fetchRoomsForLatitude:(NSString *)latitude longitude:(NSString *)longitude
 {
-    NSDictionary *parameters = @{@"access_token":AccessToken, @"latitude":latitude, @"longitude":longitude, @"offest": @"0", @"size": @"15", @"radius": @"1"};
+    NSDictionary *parameters = @{@"access_token":AccessToken, @"latitude":latitude, @"longitude":longitude, @"offest": @"0", @"size": @"50", @"radius": @"5"};
     
     [self sendGETForBaseURL:@"api/v1/chat_rooms" parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {

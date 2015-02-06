@@ -59,14 +59,14 @@ static NSString *reuseIdentifier = @"Cell";
     
     self.tableView.scrollEnabled = NO;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.90f];
+    //self.tableView.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.90f];
     
-    CGRect frame = [[UIScreen mainScreen] bounds];
-    CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
-    CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
-    CGFloat combHeight = statusHeight + navHeight;
+    //CGRect frame = [[UIScreen mainScreen] bounds];
+    //CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
+    //CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
+    //CGFloat combHeight = statusHeight + navHeight;
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake((frame.size.width)/2, (frame.size.height - combHeight)/2, 100.0, 100.0)];
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(self.view.center.x, self.view.center.y, 100.0, 100.0)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     
     self.locationManager = [[CLLocationManager alloc] init];
@@ -117,11 +117,24 @@ static NSString *reuseIdentifier = @"Cell";
 {
     NSLog(@"Did finish with rooms notif...");
     self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    [self.indicatorView stopAnimating];
-    self.tableView.scrollEnabled = YES;
-    [self stopRefresh];
-    [self.tableView reloadData];
+    if (self.roomItems.count < 1) {
+        UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+        messageLabel.textColor = [UIColor blackColor];
+        messageLabel.numberOfLines = 0;
+        messageLabel.textAlignment = NSTextAlignmentCenter;
+        messageLabel.font = [UIFont systemFontOfSize:25];
+        [messageLabel sizeToFit];
+        messageLabel.text = @"Nothing to show here.";
+        self.tableView.backgroundView = messageLabel;
+        self.tableView.scrollEnabled = NO;
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    } else {
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        [self.indicatorView stopAnimating];
+        self.tableView.scrollEnabled = YES;
+        [self stopRefresh];
+        [self.tableView reloadData];
+    }
     
 }
 

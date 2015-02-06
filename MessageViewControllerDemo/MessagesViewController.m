@@ -30,6 +30,7 @@
     self.collectionView.collectionViewLayout.incomingAvatarViewSize = CGSizeZero;
     self.collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSizeZero;
     
+    self.inputToolbar.contentView.leftBarButtonItem = nil;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishSendingWithSuccess:) name:@"didFinishSendingWithSuccess" object:nil];
     

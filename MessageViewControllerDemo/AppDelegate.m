@@ -32,6 +32,17 @@ BOOL loggedIn = NO;
     [MasterViewController class];
     [LoginViewController class];
     
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"HasLaunchedOnce"])
+    {
+        // app already launched
+    }
+    else
+    {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"HasLaunchedOnce"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        // This is the first launch ever
+    }
+    
     //UIUserNotificationSettings *notifSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound) categories:nil];
     //[[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
     //[[UIApplication sharedApplication] registerForRemoteNotifications];
