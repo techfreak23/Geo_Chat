@@ -32,6 +32,9 @@
 		046605B91A77649E00A1D298 /* map-icon@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 046605B61A77649E00A1D298 /* map-icon@3x.png */; };
 		048074BB1A351983006DAD33 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 048074BA1A351983006DAD33 /* Security.framework */; };
 		048074FD1A353DC1006DAD33 /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048074FC1A353DC1006DAD33 /* UserViewController.m */; };
+		048726D71A85749A008CF5B8 /* WelcomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048726D51A85749A008CF5B8 /* WelcomeViewController.m */; };
+		048726D81A85749A008CF5B8 /* WelcomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048726D61A85749A008CF5B8 /* WelcomeViewController.xib */; };
+		048726E11A85EFDA008CF5B8 /* RoomDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048726E01A85EFDA008CF5B8 /* RoomDetailViewController.m */; };
 		048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */; };
 		048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */; };
 		048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 048CF7491A2D9565004E20BE /* GeoChatUser.m */; };
@@ -99,6 +102,11 @@
 		048074BA1A351983006DAD33 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		048074FB1A353DC1006DAD33 /* UserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
 		048074FC1A353DC1006DAD33 /* UserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
+		048726D41A85749A008CF5B8 /* WelcomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WelcomeViewController.h; sourceTree = "<group>"; };
+		048726D51A85749A008CF5B8 /* WelcomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WelcomeViewController.m; sourceTree = "<group>"; };
+		048726D61A85749A008CF5B8 /* WelcomeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = WelcomeViewController.xib; sourceTree = "<group>"; };
+		048726DF1A85EFDA008CF5B8 /* RoomDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoomDetailViewController.h; sourceTree = "<group>"; };
+		048726E01A85EFDA008CF5B8 /* RoomDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoomDetailViewController.m; sourceTree = "<group>"; };
 		048CF73C1A2D60AB004E20BE /* AddRoomViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AddRoomViewController.h; sourceTree = "<group>"; };
 		048CF73D1A2D60AB004E20BE /* AddRoomViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AddRoomViewController.m; sourceTree = "<group>"; };
 		048CF73E1A2D60AB004E20BE /* AddRoomViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AddRoomViewController.xib; sourceTree = "<group>"; };
@@ -187,6 +195,9 @@
 				048CF74C1A2D958E004E20BE /* GeoChatManager */,
 				042440E01A2BE089004B0786 /* AppDelegate.h */,
 				042440E11A2BE089004B0786 /* AppDelegate.m */,
+				048726D41A85749A008CF5B8 /* WelcomeViewController.h */,
+				048726D51A85749A008CF5B8 /* WelcomeViewController.m */,
+				048726D61A85749A008CF5B8 /* WelcomeViewController.xib */,
 				0424410D1A2C0E00004B0786 /* LoginViewController.h */,
 				0424410E1A2C0E00004B0786 /* LoginViewController.m */,
 				0424410F1A2C0E00004B0786 /* LoginViewController.xib */,
@@ -200,6 +211,8 @@
 				044A7FC91A359A2100EADA8A /* ChangeNicknameViewController.m */,
 				0421F2C51A30544500FCAB04 /* MessagesViewController.h */,
 				0421F2C61A30544500FCAB04 /* MessagesViewController.m */,
+				048726DF1A85EFDA008CF5B8 /* RoomDetailViewController.h */,
+				048726E01A85EFDA008CF5B8 /* RoomDetailViewController.m */,
 				0421F2CD1A314D4300FCAB04 /* ProfileViewController.h */,
 				0421F2CE1A314D4300FCAB04 /* ProfileViewController.m */,
 				049B87751A7A115F00B05EC7 /* RoomMapViewController.h */,
@@ -397,6 +410,7 @@
 				046605B21A77633300A1D298 /* menu-icon@2x.png in Resources */,
 				046605B91A77649E00A1D298 /* map-icon@3x.png in Resources */,
 				048CF7401A2D60AB004E20BE /* AddRoomViewController.xib in Resources */,
+				048726D81A85749A008CF5B8 /* WelcomeViewController.xib in Resources */,
 				042441111A2C0E00004B0786 /* LoginViewController.xib in Resources */,
 				042440ED1A2BE089004B0786 /* LaunchScreen.xib in Resources */,
 				042440EA1A2BE089004B0786 /* Images.xcassets in Resources */,
@@ -467,7 +481,9 @@
 				048CF73F1A2D60AB004E20BE /* AddRoomViewController.m in Sources */,
 				042441101A2C0E00004B0786 /* LoginViewController.m in Sources */,
 				0421F2C71A30544500FCAB04 /* MessagesViewController.m in Sources */,
+				048726E11A85EFDA008CF5B8 /* RoomDetailViewController.m in Sources */,
 				049B87741A7A113A00B05EC7 /* RoomMapAnnotation.m in Sources */,
+				048726D71A85749A008CF5B8 /* WelcomeViewController.m in Sources */,
 				048CF74B1A2D9565004E20BE /* GeoChatUser.m in Sources */,
 				042440E21A2BE089004B0786 /* AppDelegate.m in Sources */,
 				044A7FCA1A359A2100EADA8A /* ChangeNicknameViewController.m in Sources */,
@@ -595,7 +611,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/mac/Documents/FacebookSDK,
-					/Users/techfreak23/Documents/FacebookSDK,
 				);
 				INFOPLIST_FILE = MessageViewControllerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -612,7 +627,6 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/mac/Documents/FacebookSDK,
-					/Users/techfreak23/Documents/FacebookSDK,
 				);
 				INFOPLIST_FILE = MessageViewControllerDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

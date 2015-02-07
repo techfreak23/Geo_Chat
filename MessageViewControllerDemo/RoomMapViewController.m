@@ -61,8 +61,6 @@ BOOL locationFetched;
 {
     [super viewWillAppear:animated];
     
-    NSLog(@"Map view appearing...");
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRooms:) name:@"didFinishFetchingRooms" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithRoomInfo:) name:@"didFinishRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
@@ -72,7 +70,6 @@ BOOL locationFetched;
 {
     [super viewWillDisappear:animated];
     
-    NSLog(@"Map view disappearing...");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -80,7 +77,6 @@ BOOL locationFetched;
 
 - (void)didFinishWithRooms:(NSNotification *)notification
 {
-    NSLog(@"We've got the rooms...");
     self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
     [self createAnnotations];
 }
@@ -94,7 +90,6 @@ BOOL locationFetched;
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
-    NSLog(@"We finished creating the room: %@", [notification object]);
     MessagesViewController *controller = [[MessagesViewController alloc] init];
     controller.roomInfo = (NSMutableDictionary *)[notification object];
     [self.navigationController pushViewController:controller animated:YES];
@@ -104,13 +99,9 @@ BOOL locationFetched;
 
 - (void)fetchRooms
 {
-    NSLog(@"Fetching rooms...");
-    
     MKUserLocation *location = self.roomMapView.userLocation;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
     NSString *longitude = [NSString stringWithFormat:@"%f", location.coordinate.longitude];
-    
-    NSLog(@"Location for fetch: %@, %@", latitude, longitude);
     
     [[GeoChatAPIManager sharedManager] fetchRoomsForLatitude:latitude longitude:longitude];
 }
@@ -160,8 +151,6 @@ BOOL locationFetched;
 
 - (void)createRoom
 {
-    NSLog(@"Creating room...");
-    
     [self.roomNameField resignFirstResponder];
     MKUserLocation *location = self.roomMapView.userLocation;
     
@@ -213,11 +202,8 @@ BOOL locationFetched;
     NSMutableArray *temp = [@[] mutableCopy];
     
     for (NSDictionary *room in self.roomItems) {
-        NSLog(@"Room info: %@", room);
         CGFloat latitude = [[room objectForKey:@"latitude"] floatValue];
         CGFloat longitude = [[room objectForKey:@"longitude"] floatValue];
-        
-        NSLog(@"Latitude: %f Longitude: %f", latitude, longitude);
         
         CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(latitude, longitude);
         
@@ -232,8 +218,6 @@ BOOL locationFetched;
     
     [self.roomMapView addAnnotations:temp];
     [self.roomMapView showAnnotations:temp animated:NO];
-    
-    NSLog(@"About to add annontations to map view...");
 }
 
 - (void)makeNewMapRegion:(NSMutableArray *)locations
@@ -288,7 +272,6 @@ BOOL locationFetched;
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
-    NSLog(@"User location: %@", userLocation);
     if (!locationFetched) {
         locationFetched = YES;
         [self updateLocation];
@@ -323,10 +306,7 @@ BOOL locationFetched;
 
 - (void)mapView:(MKMapView *)mapView annotationView:(MKAnnotationView *)view calloutAccessoryControlTapped:(UIControl *)control
 {
-    NSLog(@"Control: %@ for view: %@", control, view);
-    NSLog(@"Annotation details: %@", view.annotation);
     RoomMapAnnotation *tempAnn = (RoomMapAnnotation *)view.annotation;
-    NSLog(@"Title: %@ room id: %@", tempAnn.title, tempAnn.roomID);
     [[GeoChatAPIManager sharedManager] fetchRoomForID:tempAnn.roomID];
 }
 
@@ -339,9 +319,7 @@ BOOL locationFetched;
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    NSLog(@"The delegate is working...");
     if (textField.text.length > 3) {
-        NSLog(@"The done button should be enabling...");
         self.navigationItem.rightBarButtonItem.enabled = YES;
     }
 }
@@ -349,7 +327,6 @@ BOOL locationFetched;
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
     if (textField.text.length > 3) {
-        NSLog(@"The done button should be enabling...");
         self.navigationItem.rightBarButtonItem.enabled = YES;
     }
     
@@ -359,7 +336,6 @@ BOOL locationFetched;
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     if (textField.text.length > 3) {
-        NSLog(@"The done button should be enabling...");
         self.navigationItem.rightBarButtonItem.enabled = YES;
     }
     [textField resignFirstResponder];

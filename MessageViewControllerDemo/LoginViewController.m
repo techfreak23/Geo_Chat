@@ -16,6 +16,7 @@
 @interface LoginViewController () <FBLoginViewDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) IBOutlet FBLoginView *loginView;
+@property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
 
 @end
 
@@ -75,17 +76,26 @@
 - (void)loginViewShowingLoggedInUser:(FBLoginView *)loginView
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    self.loginView.hidden = YES;
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:self.loginView.frame];
+    self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+    [self.view addSubview:self.indicatorView];
+    
+    [self.indicatorView startAnimating];
 }
 
 - (void)loginViewShowingLoggedOutUser:(FBLoginView *)loginView
 {
     NSLog(@"%s", __PRETTY_FUNCTION__);
+    self.loginView.hidden = NO;
 }
 
 - (void)didFinishLoggingIn:(NSNotification *)notification
 {
     NSLog(@"Should be showing the main view now...");
     NSLog(@"Notification: %@", notification.description);
+    
+    [self.indicatorView stopAnimating];
     
     UITabBarController *tabController = [[UITabBarController alloc] init];
     

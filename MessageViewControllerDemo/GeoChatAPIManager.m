@@ -38,7 +38,6 @@ dispatch_queue_t kBgQueue;
     static GeoChatAPIManager *manager = nil;
     
     dispatch_once(&pred, ^{
-        NSLog(@"This is the only time you should be seeing this...");
         manager = [[GeoChatAPIManager alloc] init];
     });
     
@@ -138,15 +137,15 @@ dispatch_queue_t kBgQueue;
             RefreshToken = credential.refreshToken;
             [AFOAuthCredential storeCredential:credential withIdentifier:kOAuthTokenIdentifier];
             
+            [self fetchUserInfo];
             [self fetchUserRoomList];
             
             dispatch_async(dispatch_get_main_queue(), ^{
-                NSLog(@"Posting notification...");
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishLoggingIn" object:nil];
             });
             
         } failure:^(NSError *error) {
-            NSLog(@"Did finish with error: %@", error.description);
+            NSLog(@"Did finish logging in with error: %@", error.description);
         }];
     });
 }
@@ -165,6 +164,21 @@ dispatch_queue_t kBgQueue;
     });
 }
 
+- (void)fetchUserInfo
+{
+    NSString *baseURL = @"/api/v1/user";
+    NSDictionary *parameters = @{@"access_token": AccessToken};
+    
+    [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
+        if (!error) {
+            NSLog(@"User info: %@", responseItem);
+            self.userInfo = [responseItem mutableCopy];
+        } else {
+            NSLog(@"There was an error fetching the user's info: %@", error.description);
+        }
+    }];
+}
+
 - (void)logout
 {
     NSLog(@"Logging out and clearing token info...");
@@ -179,7 +193,7 @@ dispatch_queue_t kBgQueue;
     
     [self sendGETForBaseURL:@"api/v1/chat_rooms" parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
-            NSLog(@"Did finish successfully...");
+            NSLog(@"Did finish fetching rooms: %@", responseItem);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishFetchingRooms" object:responseItem];
             });
@@ -195,7 +209,6 @@ dispatch_queue_t kBgQueue;
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     if ([self checkID:roomID]) {
-        NSLog(@"Use was in the room so now we fetch room info...");
         [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responeItem, NSError *error) {
             if (!error) {
                 //NSLog(@"Finished fetching room with response item: %@", responeItem);
@@ -207,7 +220,6 @@ dispatch_queue_t kBgQueue;
             }
         }];
     } else {
-        NSLog(@"User was not in the room so now we have to add them...");
         [self addUserToRoom:roomID];
     }
 }
@@ -219,7 +231,7 @@ dispatch_queue_t kBgQueue;
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
-            NSLog(@"%s", __PRETTY_FUNCTION__);
+            NSLog(@"The room was created: %@", responseItem);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishCreatingRoom" object:responseItem];
             });
@@ -293,7 +305,7 @@ dispatch_queue_t kBgQueue;
         if (!error) {
             NSLog(@"%s : %@", __PRETTY_FUNCTION__, responseItem);
             dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingMessage" object:responseItem];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishSendingMessage" object:[[responseItem objectForKey:@"messages"] lastObject]];
             });
         } else {
             NSLog(@"%s : %@", __PRETTY_FUNCTION__, error.description);
@@ -310,6 +322,9 @@ dispatch_queue_t kBgQueue;
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error ) {
         if (!error) {
             NSLog(@"Response item for new messages: %@", responseItem);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishPolling" object:responseItem];
+            });
         } else {
             NSLog(@"There was an error fetching the new messages...");
         }

@@ -33,7 +33,6 @@ BOOL locationFetched;
     self.menuItems = @[@"Text field view", @"Location view", @"Map view"];
     locationFetched = NO;
     
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishCreatingRoom:) name:@"didFinishCreatingRoom" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishRoomWithError:) name:@"didFinishRoomWithError" object:nil];
     
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
@@ -48,12 +47,6 @@ BOOL locationFetched;
     
     self.tableView.scrollEnabled = NO;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -71,7 +64,6 @@ BOOL locationFetched;
 
 - (void)createNewRoom
 {
-    NSLog(@"Create room...");
     [self.roomNameField resignFirstResponder];
     MKUserLocation *location = self.mapView.userLocation;
     NSString *latitude = [NSString stringWithFormat:@"%f", location.coordinate.latitude];
@@ -82,8 +74,6 @@ BOOL locationFetched;
 
 - (void)didFinishRoomWithError:(NSNotification *)notification
 {
-    NSLog(@"There was an error...");
-    
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"We're sorry" message:@"Your room could not be created at this time. Try again later." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles:nil];
     [alert show];
 }
@@ -143,7 +133,6 @@ BOOL locationFetched;
     
     switch (indexPath.row) {
         case 0: {
-            NSLog(@"Setting name text field...");
             self.roomNameField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, cellFrame.size.height)];
             self.roomNameField.translatesAutoresizingMaskIntoConstraints = NO;
             self.roomNameField.textAlignment = NSTextAlignmentCenter;
@@ -156,7 +145,6 @@ BOOL locationFetched;
             break;
             
         case 1: {
-            NSLog(@"Setting location label...");
             self.locationLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, cellFrame.size.height)];
             self.locationLabel.translatesAutoresizingMaskIntoConstraints = NO;
             self.locationLabel.text = @"Getting location...";
@@ -168,7 +156,6 @@ BOOL locationFetched;
             break;
             
         case 2: {
-            NSLog(@"Setting map view...");
             self.mapView = [[MKMapView alloc] initWithFrame:CGRectMake(0, 0, cellFrame.size.width, self.view.frame.size.height - statusHeight - navHeight - (cellFrame.size.height * 2))];
             self.mapView.delegate = self;
             [cell.contentView addSubview:self.mapView];
@@ -179,15 +166,12 @@ BOOL locationFetched;
             break;
     }
     
-    NSLog(@"Table cell loading: %@", [self.menuItems objectAtIndex:indexPath.row]);
-    
     return cell;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.row == 2) {
-        NSLog(@"Map view cell...");
         
         CGFloat mapHeight = self.view.frame.size.height - 155;
         
@@ -203,7 +187,6 @@ BOOL locationFetched;
 {
     
     if (indexPath.row == 2) {
-        NSLog(@"Map view cell...");
         CGFloat mapHeight = self.view.frame.size.height - 155;
         
         return mapHeight;
@@ -225,34 +208,26 @@ BOOL locationFetched;
 
 - (void)mapView:(MKMapView *)mapView didFailToLocateUserWithError:(NSError *)error
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops" message:@"Could not gather your location at this time." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
     [alert show];
 }
 
 - (void)mapViewDidFailLoadingMap:(MKMapView *)mapView withError:(NSError *)error
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
-    
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Oops" message:@"The map view cannot load at this time." delegate:self cancelButtonTitle:@"Okay" otherButtonTitles: nil];
     [alert show];
 }
 
 - (void)mapViewWillStartLocatingUser:(MKMapView *)mapView
 {
-    NSLog(@"%s", __PRETTY_FUNCTION__);
+    
 }
 
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
-    NSLog(@"%s: %@", __PRETTY_FUNCTION__, userLocation);
     if (!locationFetched) {
-        NSLog(@"Location has not been fetched yet...");
         locationFetched = YES;
         [self updateLocation];
-    } else {
-        NSLog(@"The user's location is already fetched...");
     }
 }
 

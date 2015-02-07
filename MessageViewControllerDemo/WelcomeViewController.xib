@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="WelcomeViewController">
+            <connections>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to GeoChat!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bHg-9g-yjS">
+                    <rect key="frame" x="120" y="80" width="360" height="70"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="70" id="MV5-Sc-LgL"/>
+                        <constraint firstAttribute="width" constant="360" id="utg-QW-VdF"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="35"/>
+                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wfg-Mt-2SP">
+                    <rect key="frame" x="184" y="285" width="233" height="30"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="233" id="HTg-jH-OnZ"/>
+                    </constraints>
+                    <state key="normal" title="Get Started!">
+                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="0.15686274510000001" green="0.84313725490000002" blue="0.63137254899999995" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="bHg-9g-yjS" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="MGl-xQ-y1N"/>
+                <constraint firstItem="wfg-Mt-2SP" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="UqR-AB-gVx"/>
+                <constraint firstItem="bHg-9g-yjS" firstAttribute="centerX" secondItem="wfg-Mt-2SP" secondAttribute="centerX" id="bMQ-u6-t45"/>
+                <constraint firstItem="bHg-9g-yjS" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="80" id="fxl-Cc-A2q"/>
+            </constraints>
+        </view>
+    </objects>
+</document>

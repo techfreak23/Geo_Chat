@@ -22,11 +22,13 @@
 #define kBgQueue dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
 #define IS_IOS_8_OR_LATER ([[[UIDevice currentDevice] systemVersion] floatValue] >= 8.0)
 
-@interface MasterViewController () <CLLocationManagerDelegate, UIActionSheetDelegate, UIAlertViewDelegate, UINavigationControllerDelegate>
+@interface MasterViewController () <CLLocationManagerDelegate, UIActionSheetDelegate, UIAlertViewDelegate, UIPickerViewDataSource, UIPickerViewDelegate>
 
 @property (nonatomic, strong) NSMutableArray *roomItems;
+@property (nonatomic, strong) NSArray *pickerItems;
 @property (nonatomic, strong) CLLocationManager *locationManager;
 @property (nonatomic, strong) UIActivityIndicatorView *indicatorView;
+@property (nonatomic, strong) UIPickerView *pickerView;
 
 @end
 
@@ -38,7 +40,7 @@ static NSString *reuseIdentifier = @"Cell";
 {
     [super viewDidLoad];
     
-    NSLog(@"Master view loading...");
+    self.pickerItems = @[@"1", @"2", @"3", @"5", @"10", @"15", @"20", @"50"];
     
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
@@ -50,7 +52,6 @@ static NSString *reuseIdentifier = @"Cell";
     
     self.navigationController.navigationBar.barTintColor  = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
     self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-    self.navigationController.delegate = self;
     
     UIRefreshControl *refresh = [[UIRefreshControl alloc] init];
     refresh.attributedTitle = [[NSAttributedString alloc] initWithString:@"Pull to load new rooms"];
@@ -59,14 +60,10 @@ static NSString *reuseIdentifier = @"Cell";
     
     self.tableView.scrollEnabled = NO;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    //self.tableView.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:0.90f];
     
-    //CGRect frame = [[UIScreen mainScreen] bounds];
-    //CGFloat navHeight = self.navigationController.navigationBar.frame.size.height;
-    //CGFloat statusHeight = [[UIApplication sharedApplication] statusBarFrame].size.height;
-    //CGFloat combHeight = statusHeight + navHeight;
+    CGRect frame = [[UIScreen mainScreen] bounds];
     
-    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(self.view.center.x, self.view.center.y, 100.0, 100.0)];
+    self.indicatorView = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(frame.size.width/2 - 40.0f, frame.size.height/2 - 40.0f, 80.0f, 80.0f)];
     self.indicatorView.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     
     self.locationManager = [[CLLocationManager alloc] init];
@@ -77,7 +74,6 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    NSLog(@"Adding master observer...");
     
     NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -93,22 +89,11 @@ static NSString *reuseIdentifier = @"Cell";
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    NSLog(@"Removing master observer...");
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishFetchingRooms" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"didFinishRoomInfo" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"deleteWasSuccessful" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"deleteWasUnsuccessful" object:nil];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)navigationController:(UINavigationController *)navigationController willShowViewController:(UIViewController *)viewController animated:(BOOL)animated
-{
-    NSLog(@"Shown view controller: %@", [viewController class]);
 }
 
 #pragma notification methods
@@ -140,7 +125,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
-    NSLog(@"Did finish creating room notif...");
     [self.navigationController dismissViewControllerAnimated:YES completion:^{
         MessagesViewController *controller = [[MessagesViewController alloc] init];
         controller.roomInfo = (NSMutableDictionary *)[notification object];
@@ -150,7 +134,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
 {
-    NSLog(@"Did finish room info notif...");
     MessagesViewController *controller = [[MessagesViewController alloc] init];
     controller.roomInfo = (NSMutableDictionary *)[notification object];
     [self.navigationController pushViewController:controller animated:YES];
@@ -165,7 +148,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)cannotDeleteRoom
 {
-    NSLog(@"User is not authorized to delete room...");
     NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     [self showAlertViewWithTitle:@"Unauthorized" message:@"You must be the adminstrator of a room to delete it." cancelButton:@"Got it"];
@@ -220,7 +202,7 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)viewSettings
 {
-    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Logout", nil];
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:@"Options" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"View profile", @"Change radius", @"Logout", nil];
     actionSheet.tintColor = [UIColor colorWithRed:20.0/255.0f green:204.0/255.0f blue:96.0/255.0f alpha:1.0f];
     [actionSheet showInView:self.view];
 }
@@ -277,11 +259,8 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"Did select row: %@", [self.roomItems objectAtIndex:indexPath.row]);
-    
     NSDictionary *temp = (NSDictionary *)[self.roomItems objectAtIndex:indexPath.row];
     NSString *roomID = (NSString *)[temp objectForKey:@"id"];
-    NSLog(@"Room id: %@", roomID);
     
     [[GeoChatAPIManager sharedManager] fetchRoomForID:roomID];
 }
@@ -319,8 +298,6 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-    NSLog(@"Auth status did change: %d", status);
-    
     CLAuthorizationStatus locationServices = [CLLocationManager locationServicesEnabled];
     
     UILabel *messageLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
@@ -397,8 +374,7 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-    CLLocation *location = [locations lastObject];
-    NSLog(@"Gathering location: %@", location);
+    //CLLocation *location = [locations lastObject];
     [manager stopUpdatingLocation];
     [self fetchRooms];
 }
@@ -414,7 +390,22 @@ static NSString *reuseIdentifier = @"Cell";
         }
             break;
             
-        case 1:{
+        case 1: {
+            NSLog(@"Creating picker view and adding to view...");
+            float height = 216.0f;
+            float width = self.view.bounds.size.width;
+            float startXCoord = self.view.bounds.size.height - height;
+            
+            self.pickerView = [[UIPickerView alloc] init];
+            self.pickerView.frame = CGRectMake(startXCoord, 0, width, height);
+            self.pickerView.delegate = self;
+            self.pickerView.dataSource = self;
+            self.pickerView.showsSelectionIndicator = YES;
+            [self.view addSubview:self.pickerView];
+        }
+            break;
+            
+        case 2:{
             NSLog(@"User wants to logout");
             
             [self alertViewWithTitle:@"Logout" message:@"Are you sure?" cancelButton:@"Never mind" otherButtonTitles:@[@"Logout"] tag:203];
@@ -496,6 +487,31 @@ static NSString *reuseIdentifier = @"Cell";
         default:
             break;
     }
+}
+
+#pragma mark - picker data source
+
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
+{
+    return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component
+{
+    return self.pickerItems.count;
+}
+
+- (NSString *)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component
+{
+    return (NSString *)[self.pickerItems objectAtIndex:row];
+}
+
+
+#pragma mark - picker delegate
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
+{
+    NSLog(@"Row: %ld\nComponent: %ld", (long)row, (long)component);
 }
 
 @end
