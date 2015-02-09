@@ -129,6 +129,11 @@
     }
 }
 
+- (void)checkUserName
+{
+    
+}
+
 #pragma mark - 
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
