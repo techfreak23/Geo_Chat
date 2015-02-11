@@ -14,6 +14,7 @@
 
 @property (nonatomic, strong) NSMutableDictionary *fullRoomInfo;
 @property (nonatomic, strong) NSMutableDictionary *userInfo;
+@property (nonatomic, strong) NSMutableArray *userList;
 @property (nonatomic, strong) NSMutableArray *messages;
 @property (nonatomic, strong) NSMutableArray *jsqMessages;
 @property (nonatomic, strong) NSTimer *refreshTimer;
@@ -47,6 +48,8 @@
     self.showLoadEarlierMessagesHeader = NO;
     
     self.messages = [[self.roomInfo objectForKey:@"messages"] mutableCopy];
+    self.userList = [[self.roomInfo objectForKey:@"users"] mutableCopy];
+    
     self.jsqMessages = [@[] mutableCopy];
     [self createJSQMessages];
     
@@ -78,7 +81,9 @@
 
 - (void)refreshMessages
 {
-    [[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:[[self.messages lastObject] objectForKey:@"message_index"]];
+    if (self.messages.count > 0) {
+        [[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:[[self.messages lastObject] objectForKey:@"message_index"]];
+    }
 }
 
 - (void)createJSQMessages
@@ -108,11 +113,25 @@
 {
     NSArray *newMessages = (NSArray *)[[notification object] objectForKey:@"messages"];
     
+    NSString *userName;
+    
+    NSLog(@"users in the room: %@", self.userList);
+    
     if (newMessages.count > 0) {
         [self.messages addObjectsFromArray:newMessages];
         
         for (NSDictionary *temp in newMessages) {
-            JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [temp objectForKey:@"user_id"]] senderDisplayName:@"kylelapp" date:[temp objectForKey:@"time"] text:[temp objectForKey:@"content"]];
+            NSString *tempID = [NSString stringWithFormat:@"%@", [temp objectForKey:@"user_id"]];
+            
+            for (NSDictionary *tmp in self.userList) {
+                NSString *currentID = [tmp objectForKey:@"id"];
+                
+                if ([tempID intValue] == [currentID intValue]) {
+                    userName = [tmp objectForKey:@"nick_name"];
+                }
+            }
+            
+            JSQMessage *newMessage = [[JSQMessage alloc] initWithSenderId:[NSString stringWithFormat:@"%@", [temp objectForKey:@"user_id"]] senderDisplayName:userName date:[temp objectForKey:@"time"] text:[temp objectForKey:@"content"]];
             [self.jsqMessages addObject:newMessage];
         }
         [JSQSystemSoundPlayer jsq_playMessageReceivedSound];
@@ -197,8 +216,6 @@
     JSQMessagesCollectionViewCell *cell = (JSQMessagesCollectionViewCell *)[super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
     JSQMessage *message = [self.jsqMessages objectAtIndex:indexPath.item];
-    
-    NSLog(@"Message at index path %ld message: %@", (long)indexPath.item, message);
     
     if ([message.senderId isEqualToString:self.senderId]) {
         cell.textView.textColor = [UIColor whiteColor];

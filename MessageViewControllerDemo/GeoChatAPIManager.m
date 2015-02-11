@@ -8,19 +8,22 @@
 
 #define kGeoChatEndpoint @"https://geochat-v1.herokuapp.com"
 #define kOAuthTokenIdentifier @"OAuthTokenIdentifier"
+#define kFayeServerURL @"ws://10.0.1.5:9292/faye"
 
 #import <AFNetworking/AFNetworking.h>
 #import <AFOAuth2Manager/AFOAuth2Manager.h>
+#import <MZFayeClient/MZFayeClient.h>
 #import "GeoChatAPIManager.h"
 
 typedef void (^RequestCompletion)(id responseItem, NSError *error);
 
-@interface GeoChatAPIManager()
+@interface GeoChatAPIManager()<MZFayeClientDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) AFHTTPRequestOperationManager *operationManager;
 @property (nonatomic, strong) AFOAuth2Manager *oAuthManager;
 @property (nonatomic, strong) NSMutableArray *joinedRooms;
 @property (nonatomic, strong) NSMutableDictionary *userInfo;
+@property (nonatomic, strong) MZFayeClient *client;
 
 @end
 
@@ -55,6 +58,10 @@ dispatch_queue_t kBgQueue;
         _operationManager.completionQueue = kBgQueue;
         _operationManager.requestSerializer = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
         _joinedRooms = [@[] mutableCopy];
+        _client = [[MZFayeClient alloc] initWithURL:[NSURL URLWithString:kFayeServerURL]];
+        _client.delegate = self;
+        [_client connect];
+        [self listenForSocket];
     }
     
     return self;
@@ -63,6 +70,13 @@ dispatch_queue_t kBgQueue;
 - (NSMutableDictionary *)userInfo
 {
     return _userInfo;
+}
+
+- (void)listenForSocket
+{
+    [self.client subscribeToChannel:@"/server" usingBlock:^(NSDictionary *message) {
+        NSLog(@"Message from faye client: %@", message);
+    }];
 }
 
 #pragma mark - Request methods
@@ -346,7 +360,42 @@ dispatch_queue_t kBgQueue;
     }];
 }
 
+#pragma mark - faye client delegate
 
+- (void)fayeClient:(MZFayeClient *)client didConnectToURL:(NSURL *)url
+{
+    NSLog(@"Faye did connect to URL: %@", url);
+}
+
+- (void)fayeClient:(MZFayeClient *)client didDisconnectWithError:(NSError *)error
+{
+    
+}
+
+- (void)fayeClient:(MZFayeClient *)client didFailDeserializeMessage:(NSDictionary *)message withError:(NSError *)error
+{
+    
+}
+
+- (void)fayeClient:(MZFayeClient *)client didFailWithError:(NSError *)error
+{
+    NSLog(@"Faye did fail with error: %@", error.description);
+}
+
+- (void)fayeClient:(MZFayeClient *)client didReceiveMessage:(NSDictionary *)messageData fromChannel:(NSString *)channel
+{
+    NSLog(@"Did receive message data: %@ from channel: %@", messageData, channel);
+}
+
+- (void)fayeClient:(MZFayeClient *)client didSubscribeToChannel:(NSString *)channel
+{
+    NSLog(@"Subcribed to channel: %@", channel);
+}
+
+- (void)fayeClient:(MZFayeClient *)client didUnsubscribeFromChannel:(NSString *)channel
+{
+    
+}
 
 
 @end
