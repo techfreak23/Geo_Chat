@@ -9,6 +9,7 @@
 #import "LoginViewController.h"
 #import "MasterViewController.h"
 #import "RoomMapViewController.h"
+#import "ChangeNicknameViewController.h"
 #import "GeoChatAPIManager.h"
 
 #define kFacebookTokenIdentifier @"facebookToken"
@@ -28,7 +29,8 @@
     
     [super viewDidLoad];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLoggingIn:) name:@"didFinishLoggingIn" object:nil];
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishLoggingIn:) name:@"didFinishLoggingIn" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithUserInfo:) name:@"finishedFetchingUserInfo" object:nil];
     
     self.title = @"Welcome to GeoChat!";
     self.navigationController.navigationBarHidden = YES;
@@ -38,7 +40,6 @@
     
     self.view.backgroundColor = [UIColor colorWithRed:40.0/255.0f green:215.0/255.0f blue:161.0/255.0f alpha:1.0f];
     
-    // Do any additional setup after loading the view from its nib.
     self.loginView.delegate = self;
     self.loginView.readPermissions = @[@"public_profile", @"email"];
 }
@@ -46,19 +47,11 @@
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
     return UIStatusBarStyleLightContent;
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 - (void)loginView:(FBLoginView *)loginView handleError:(NSError *)error
@@ -93,10 +86,44 @@
 - (void)didFinishLoggingIn:(NSNotification *)notification
 {
     NSLog(@"Should be showing the main view now...");
-    NSLog(@"Notification: %@", notification.description);
+    //NSLog(@"Notification: %@", notification.description);
     
     [self.indicatorView stopAnimating];
+}
+
+- (void)didFinishWithUserInfo:(NSNotification *)notification
+{
+    NSLog(@"User info from login: %@", [notification object]);
+    [self.indicatorView stopAnimating];
+    id nickname = [[notification object] objectForKey:@"nick_name"];
+    NSLog(@"Nickname on login: %@", nickname);
     
+    if ([nickname isKindOfClass:[NSNull class]]) {
+        NSLog(@"This user does not have a username!");
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFinishWithChange:) name:@"didFinishWithChange" object:nil];
+        ChangeNicknameViewController *controller = [[ChangeNicknameViewController alloc] init];
+        UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:controller];
+        
+        [self.navigationController presentViewController:navController animated:YES completion:nil];
+        
+    } else {
+        NSLog(@"This user is good to go!");
+        [self presentMasterViewController];
+    }
+    
+}
+
+- (void)didFinishWithChange:(NSNotification *)notification
+{
+    NSLog(@"User has finished changing their user name: %@", [notification object]);
+    [self.navigationController dismissViewControllerAnimated:YES completion:^{
+        [self presentMasterViewController];
+    }];
+}
+
+- (void)presentMasterViewController
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     UITabBarController *tabController = [[UITabBarController alloc] init];
     
     MasterViewController *controller = [[MasterViewController alloc] initWithNibName:@"MasterViewController" bundle:nil];

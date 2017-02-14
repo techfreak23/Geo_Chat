@@ -40,8 +40,6 @@ static NSString *reuseIdentifier = @"Cell";
 {
     [super viewDidLoad];
     
-    self.pickerItems = @[@"1", @"2", @"3", @"5", @"10", @"15", @"20", @"50"];
-    
     self.navigationController.navigationBar.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor whiteColor]};
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     
@@ -111,15 +109,16 @@ static NSString *reuseIdentifier = @"Cell";
         [messageLabel sizeToFit];
         messageLabel.text = @"Nothing to show here.";
         self.tableView.backgroundView = messageLabel;
-        self.tableView.scrollEnabled = NO;
+        self.tableView.scrollEnabled = YES;
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     } else {
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-        [self.indicatorView stopAnimating];
         self.tableView.scrollEnabled = YES;
-        [self stopRefresh];
         [self.tableView reloadData];
     }
+    
+    [self.indicatorView stopAnimating];
+    [self stopRefresh];
     
 }
 
@@ -144,6 +143,11 @@ static NSString *reuseIdentifier = @"Cell";
     NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
     [self.roomItems removeObjectAtIndex:indexPath.row];
     //[self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
+}
+
+- (void)didReceiveNewMessage:(NSNotification *)notification
+{
+    NSLog(@"New message from faye: %@", [notification object]);
 }
 
 - (void)cannotDeleteRoom
@@ -247,12 +251,12 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 62.0f;
+    return 58.0f;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 62.0f;
+    return 58.0f;
 }
 
 #pragma mark - table view delegate methods
@@ -511,7 +515,7 @@ static NSString *reuseIdentifier = @"Cell";
 
 - (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component
 {
-    NSLog(@"Row: %ld\nComponent: %ld", (long)row, (long)component);
+    //NSLog(@"Row: %ld\nComponent: %ld", (long)row, (long)component);
 }
 
 @end

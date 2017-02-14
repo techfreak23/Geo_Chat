@@ -120,6 +120,7 @@ BOOL locationFetched;
     CGRect frame = [[UIScreen mainScreen] bounds];
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    
     cell.translatesAutoresizingMaskIntoConstraints = NO;
     [cell.contentView sizeToFit];
     frame.size.height = cell.frame.size.height;
@@ -226,6 +227,7 @@ BOOL locationFetched;
 - (void)mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
 {
     if (!locationFetched) {
+        NSLog(@"Let's update the user's location...");
         locationFetched = YES;
         [self updateLocation];
     }

@@ -49,6 +49,7 @@ BOOL locationFetched;
     UIBarButtonItem *addRoomButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addRoom)];
     
     self.navigationItem.title = @"GeoChat!";
+    
     [self.navigationItem setRightBarButtonItems:@[addRoomButton, refreshButton]];
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"System-settings-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(viewSettings)];
@@ -78,7 +79,14 @@ BOOL locationFetched;
 - (void)didFinishWithRooms:(NSNotification *)notification
 {
     self.roomItems = [NSMutableArray arrayWithArray:(NSArray *)[notification object]];
-    [self createAnnotations];
+    
+    if (self.roomItems.count > 1) {
+        [self createAnnotations];
+    } else {
+        MKUserLocation *userLocation = self.roomMapView.userLocation;
+        MKCoordinateRegion region = MKCoordinateRegionMakeWithDistance(userLocation.location.coordinate, 5000, 5000);
+        [self.roomMapView setRegion:region animated:YES];
+    }
 }
 
 - (void)didFinishWithRoomInfo:(NSNotification *)notification
@@ -90,6 +98,24 @@ BOOL locationFetched;
 
 - (void)didFinishCreatingRoom:(NSNotification *)notification
 {
+    NSLog(@"Finished with new room: %@", notification.object);
+    
+    NSDictionary *newRoom = (NSDictionary *)notification.object;
+    
+    CGFloat latitude = [[newRoom objectForKey:@"latitude"] floatValue];
+    CGFloat longitude = [[newRoom objectForKey:@"longitude"] floatValue];
+    
+    CLLocationCoordinate2D coord = CLLocationCoordinate2DMake(latitude, longitude);
+    
+    RoomMapAnnotation *newPoint = [[RoomMapAnnotation alloc] init];
+    
+    newPoint.title = [newRoom objectForKey:@"name"];
+    newPoint.subtitle = @"Distance: 0.0";
+    newPoint.coordinate = coord;
+    newPoint.roomID = [newRoom objectForKey:@"id"];
+    
+    [self.roomMapView addAnnotation:newPoint];
+    
     MessagesViewController *controller = [[MessagesViewController alloc] init];
     controller.roomInfo = (NSMutableDictionary *)[notification object];
     [self.navigationController pushViewController:controller animated:YES];
@@ -186,7 +212,6 @@ BOOL locationFetched;
         }
     }];
 }
-
 
 - (void)updateLocation
 {

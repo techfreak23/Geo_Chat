@@ -10,4 +10,6 @@
 
 @interface RoomDetailViewController : UITableViewController
 
+@property (nonatomic, strong) NSDictionary *roomDetails;
+
 @end

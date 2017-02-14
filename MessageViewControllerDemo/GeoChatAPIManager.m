@@ -6,18 +6,18 @@
 //  Copyright (c) 2015 MosRedRocket. All rights reserved.
 //
 
-#define kGeoChatEndpoint @"https://geochat-v1.herokuapp.com"
+#define kGeoChatEndpoint @"https://geocodev2.herokuapp.com" //@"https://geochat-v1.herokuapp.com"
 #define kOAuthTokenIdentifier @"OAuthTokenIdentifier"
-#define kFayeServerURL @"ws://10.0.1.5:9292/faye"
+#define kFayeServerURL @"ws://localhost:9292/faye"
 
 #import <AFNetworking/AFNetworking.h>
 #import <AFOAuth2Manager/AFOAuth2Manager.h>
-#import <MZFayeClient/MZFayeClient.h>
+#import <MZFayeClient.h>
 #import "GeoChatAPIManager.h"
 
 typedef void (^RequestCompletion)(id responseItem, NSError *error);
 
-@interface GeoChatAPIManager()<MZFayeClientDelegate, UIAlertViewDelegate>
+@interface GeoChatAPIManager() <MZFayeClientDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, strong) AFHTTPRequestOperationManager *operationManager;
 @property (nonatomic, strong) AFOAuth2Manager *oAuthManager;
@@ -27,8 +27,8 @@ typedef void (^RequestCompletion)(id responseItem, NSError *error);
 
 @end
 
-static NSString *ClientID = @"81fc0fd70219e5701f54982262b0f6b3c4bb6643a289581ae023bc85513e32e3";
-static NSString *ClientSecret = @"87fa1dde258a6bea536840d98b1c8934d26790cbb0124c3a136f1da2f2a8803b";
+static NSString *ClientID = @"81fc0fd70219e5701f54982262b0f6b3c4bb6643a289581ae023bc85513e32e3"; //@"852aec104c55c96f6d2ebb23a0bcdeb410af59291582c58214250ea2055c76fd"; //@"81fc0fd70219e5701f54982262b0f6b3c4bb6643a289581ae023bc85513e32e3";
+static NSString *ClientSecret = @"87fa1dde258a6bea536840d98b1c8934d26790cbb0124c3a136f1da2f2a8803b"; //@"be314b571a071925b23dfc49d6b1cf90bf3848ccf10133d3bc62b55ce93992e1"; //@"87fa1dde258a6bea536840d98b1c8934d26790cbb0124c3a136f1da2f2a8803b";
 NSString *AccessToken;
 NSString *RefreshToken;
 dispatch_queue_t kBgQueue;
@@ -58,10 +58,9 @@ dispatch_queue_t kBgQueue;
         _operationManager.completionQueue = kBgQueue;
         _operationManager.requestSerializer = [AFJSONRequestSerializer serializerWithWritingOptions:NSJSONWritingPrettyPrinted];
         _joinedRooms = [@[] mutableCopy];
-        _client = [[MZFayeClient alloc] initWithURL:[NSURL URLWithString:kFayeServerURL]];
-        _client.delegate = self;
-        [_client connect];
-        [self listenForSocket];
+        //_client = [[MZFayeClient alloc] initWithURL:[NSURL URLWithString:kFayeServerURL]];
+        //_client.delegate = self;
+        //[_client connect];
     }
     
     return self;
@@ -72,11 +71,25 @@ dispatch_queue_t kBgQueue;
     return _userInfo;
 }
 
-- (void)listenForSocket
+- (void)listenForChannel
 {
-    [self.client subscribeToChannel:@"/server" usingBlock:^(NSDictionary *message) {
-        NSLog(@"Message from faye client: %@", message);
-    }];
+    //[self.client subscribeToChannel:@"/server" usingBlock:^(NSDictionary *message) {
+        //NSLog(@"Message from faye client: %@", message);
+    //}];
+    
+   // UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)]
+}
+
+- (void)disconnectClient
+{
+    //[self.client disconnect];
+}
+
+- (void)setUpClient
+{
+    self.client = [[MZFayeClient alloc] init];
+    self.client.delegate = self;
+    //[self.client connectToURL:[NSURL URLWithString:kFayeServerURL]];
 }
 
 #pragma mark - Request methods
@@ -86,7 +99,6 @@ dispatch_queue_t kBgQueue;
     dispatch_async(kBgQueue, ^{
         self.operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
         [self.operationManager GET:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-            //NSLog(@"Did finish GET with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish GET with error: %@", error.description);
@@ -101,7 +113,6 @@ dispatch_queue_t kBgQueue;
     dispatch_async(kBgQueue, ^{
         self.operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
         [self.operationManager POST:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
-            //NSLog(@"Did finish POST with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
             NSLog(@"Did finish POST with error: %@", error.description);
@@ -113,7 +124,8 @@ dispatch_queue_t kBgQueue;
 - (void)sendPATCHRequestForBaseURL:(NSString *)baseURL parameters:(NSDictionary *)parameters completion:(RequestCompletion)handler
 {
     dispatch_async(kBgQueue, ^{
-        [self.operationManager PATCH:baseURL parameters:self success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        self.operationManager.responseSerializer = [AFJSONResponseSerializer serializerWithReadingOptions:NSJSONReadingAllowFragments];
+        [self.operationManager PATCH:baseURL parameters:parameters success:^(AFHTTPRequestOperation *operation, id responseObject) {
             NSLog(@"Did finish PATCH with object: %@", responseObject);
             handler(responseObject, nil);
         } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
@@ -154,10 +166,6 @@ dispatch_queue_t kBgQueue;
             [self fetchUserInfo];
             [self fetchUserRoomList];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishLoggingIn" object:nil];
-            });
-            
         } failure:^(NSError *error) {
             NSLog(@"Did finish logging in with error: %@", error.description);
         }];
@@ -185,8 +193,15 @@ dispatch_queue_t kBgQueue;
     
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
-            NSLog(@"User info: %@", responseItem);
             self.userInfo = [responseItem mutableCopy];
+            if (![[self.userInfo objectForKey:@"channel_name"] isKindOfClass:[NSNull class]]) {
+                //NSLog(@"Here is the channel name: %@", [self.userInfo objectForKey:@"channel_name"]);
+            } else {
+                //NSLog(@"There is no channel name...");
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"finishedFetchingUserInfo" object:responseItem];
+            });
         } else {
             NSLog(@"There was an error fetching the user's info: %@", error.description);
         }
@@ -199,15 +214,32 @@ dispatch_queue_t kBgQueue;
     [AFOAuthCredential deleteCredentialWithIdentifier:kOAuthTokenIdentifier];
 }
 
+- (void)updateUsername:(NSString *)username
+{
+    NSString *baseUrl = @"/api/v1/user";
+    NSDictionary *parameters = @{@"access_token": AccessToken, @"user": @{@"nick_name": username}};
+    
+    [self sendPATCHRequestForBaseURL:baseUrl parameters:parameters completion:^(id responseItem, NSError *error) {
+        if (!error) {
+            NSLog(@"User finished with name: %@", responseItem);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishWithChange" object:responseItem];
+            });
+        } else {
+            NSLog(@"Could not update user's nickname: %@", error.description);
+        }
+    }];
+}
+
 #pragma mark - misc methods for rooms etc
 
 - (void)fetchRoomsForLatitude:(NSString *)latitude longitude:(NSString *)longitude
 {
+    NSString *baseUrl = @"api/v1/chat_rooms";
     NSDictionary *parameters = @{@"access_token":AccessToken, @"latitude":latitude, @"longitude":longitude, @"offest": @"0", @"size": @"50", @"radius": @"5"};
     
-    [self sendGETForBaseURL:@"api/v1/chat_rooms" parameters:parameters completion:^(id responseItem, NSError *error) {
+    [self sendGETForBaseURL:baseUrl parameters:parameters completion:^(id responseItem, NSError *error) {
         if (!error) {
-            NSLog(@"Did finish fetching rooms: %@", responseItem);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishFetchingRooms" object:responseItem];
             });
@@ -219,13 +251,12 @@ dispatch_queue_t kBgQueue;
 
 - (void)fetchRoomForID:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"api/v1/chat_room"];
+    NSString *baseURL = @"api/v1/chat_room";
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     if ([self checkID:roomID]) {
         [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responeItem, NSError *error) {
             if (!error) {
-                //NSLog(@"Finished fetching room with response item: %@", responeItem);
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishRoomInfo" object:responeItem];
                 });
@@ -240,7 +271,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)createRoom:(NSString *)name latitude:(NSString *)latitude longitude:(NSString *)longitude
 {
-    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_rooms/create"];
+    NSString *baseURL = @"/api/v1/chat_rooms/create";
     NSDictionary *parameters = @{@"access_token": AccessToken, @"chat_room": @{@"name": name, @"latitude": latitude, @"longitude": longitude}};
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -260,7 +291,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)deleteRoom:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_room"];
+    NSString *baseURL = @"/api/v1/chat_room";
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     NSLog(@"Attempting to delete room...");
@@ -281,7 +312,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)addUserToRoom:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_room/add_user"];
+    NSString *baseURL = @"/api/v1/chat_room/add_user";
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID};
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -312,7 +343,10 @@ dispatch_queue_t kBgQueue;
 
 - (void)sendMessage:(NSString *)content room:(NSString *)roomID
 {
-    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/chat_room/send_message"];
+    //[self.client sendMessage:@{@"text":content} toChannel:@"/server"];
+    
+    /*
+    NSString *baseURL = @"/api/v1/chat_room/send_message";
     NSDictionary *parameters = @{@"access_token": AccessToken, @"id": roomID, @"message": @{@"content": content}};
     
     [self sendPOSTForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -325,7 +359,7 @@ dispatch_queue_t kBgQueue;
             NSLog(@"%s : %@", __PRETTY_FUNCTION__, error.description);
         }
     }];
-    
+    */
 }
 
 - (void)fetchNewMessagesForRoom:(NSString *)roomID messageIndex:(NSString *)index
@@ -335,7 +369,6 @@ dispatch_queue_t kBgQueue;
     
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error ) {
         if (!error) {
-            NSLog(@"Response item for new messages: %@", responseItem);
             dispatch_async(dispatch_get_main_queue(), ^{
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"didFinishPolling" object:responseItem];
             });
@@ -347,7 +380,7 @@ dispatch_queue_t kBgQueue;
 
 - (void)fetchUserRoomList
 {
-    NSString *baseURL = [NSString stringWithFormat:@"/api/v1/user/chat_rooms"];
+    NSString *baseURL = @"/api/v1/user/chat_rooms";
     NSDictionary *parameters = @{@"access_token" : AccessToken};
     
     [self sendGETForBaseURL:baseURL parameters:parameters completion:^(id responseItem, NSError *error) {
@@ -364,7 +397,8 @@ dispatch_queue_t kBgQueue;
 
 - (void)fayeClient:(MZFayeClient *)client didConnectToURL:(NSURL *)url
 {
-    NSLog(@"Faye did connect to URL: %@", url);
+    //NSLog(@"Faye did connect to URL: %@", url);
+    [self listenForChannel];
 }
 
 - (void)fayeClient:(MZFayeClient *)client didDisconnectWithError:(NSError *)error
@@ -379,12 +413,16 @@ dispatch_queue_t kBgQueue;
 
 - (void)fayeClient:(MZFayeClient *)client didFailWithError:(NSError *)error
 {
-    NSLog(@"Faye did fail with error: %@", error.description);
+    //NSLog(@"Faye did fail with error: %@", error.description);
 }
 
 - (void)fayeClient:(MZFayeClient *)client didReceiveMessage:(NSDictionary *)messageData fromChannel:(NSString *)channel
 {
     NSLog(@"Did receive message data: %@ from channel: %@", messageData, channel);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"Sending message received notification");
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"didReceiveNewMessage" object:nil];
+    });
 }
 
 - (void)fayeClient:(MZFayeClient *)client didSubscribeToChannel:(NSString *)channel

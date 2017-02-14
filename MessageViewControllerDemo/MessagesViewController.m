@@ -26,9 +26,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-    
-    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:15.0f target:self selector:@selector(pollForNewMessages:) userInfo:nil repeats:YES];
     
     self.title = [self.roomInfo objectForKey:@"name"];
     
@@ -56,7 +53,7 @@
     UIBarButtonItem *menuButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"actions-ellipse"] style:UIBarButtonItemStylePlain target:self action:@selector(showOptions)];
     UIBarButtonItem *refreshButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(refreshMessages)];
     [self.navigationItem setRightBarButtonItems:@[menuButton, refreshButton] animated:YES];
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:nil];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:self action:@selector(returnToMaster)];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -64,12 +61,16 @@
     [super viewWillDisappear:animated];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self.refreshTimer invalidate];
 }
 
 - (BOOL)hidesBottomBarWhenPushed
 {
     return YES;
+}
+
+- (void)returnToMaster
+{
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 - (void)showOptions
@@ -82,7 +83,7 @@
 - (void)refreshMessages
 {
     if (self.messages.count > 0) {
-        [[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:[[self.messages lastObject] objectForKey:@"message_index"]];
+        //[[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:[[self.messages lastObject] objectForKey:@"message_index"]];
     }
 }
 
@@ -109,14 +110,20 @@
     [self finishSendingMessageAnimated:YES];
 }
 
+- (void)didReceiveNewMessage:(NSNotification *)notification
+{
+    NSLog(@"New message from faye server...");
+}
+
 - (void)didFinishPolling:(NSNotification *)notification
 {
-    NSArray *newMessages = (NSArray *)[[notification object] objectForKey:@"messages"];
+    //NSArray *newMessages = (NSArray *)[[notification object] objectForKey:@"messages"];
     
-    NSString *userName;
+    //NSString *userName;
     
     NSLog(@"users in the room: %@", self.userList);
     
+    /*
     if (newMessages.count > 0) {
         [self.messages addObjectsFromArray:newMessages];
         
@@ -137,6 +144,7 @@
         [JSQSystemSoundPlayer jsq_playMessageReceivedSound];
         [self finishReceivingMessageAnimated:YES];
     }
+     */
 }
 
 - (void)pollForNewMessages:(NSTimer *)timer
@@ -146,11 +154,6 @@
         NSLog(@"Fetching new messages from timer method...");
         [[GeoChatAPIManager sharedManager] fetchNewMessagesForRoom:[self.roomInfo objectForKey:@"id"] messageIndex:[[self.messages lastObject] objectForKey:@"message_index"]];
     }
-}
-
-- (void)checkUserName
-{
-    
 }
 
 #pragma mark - 

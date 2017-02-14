@@ -321,6 +321,7 @@
 				042440D61A2BE089004B0786 /* Frameworks */,
 				042440D71A2BE089004B0786 /* Resources */,
 				15EF62A2BAE2F54D73961049 /* Copy Pods Resources */,
+				A677203145B9BF96E2A5A672 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -453,6 +454,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MessageViewControllerDemo/Pods-MessageViewControllerDemo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A677203145B9BF96E2A5A672 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MessageViewControllerDemo/Pods-MessageViewControllerDemo-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		BF0BDC619AB0C711CCEE31E1 /* Check Pods Manifest.lock */ = {
@@ -613,6 +629,7 @@
 					/Users/mac/Documents/FacebookSDK,
 				);
 				INFOPLIST_FILE = MessageViewControllerDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -629,6 +646,7 @@
 					/Users/mac/Documents/FacebookSDK,
 				);
 				INFOPLIST_FILE = MessageViewControllerDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

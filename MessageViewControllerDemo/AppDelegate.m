@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "MasterViewController.h"
 #import "LoginViewController.h"
+#import "MessagesViewController.h"
 
 @interface AppDelegate ()
 
@@ -21,11 +22,11 @@ BOOL loggedIn = NO;
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    NSLog(@"Options: %@", launchOptions);
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleLightContent;
-    
-    NSLog(@"Launch options: %@", launchOptions);
     
     // Override point for customization after application launch.
     [FBLoginView class];
@@ -45,9 +46,9 @@ BOOL loggedIn = NO;
         NSLog(@"This is the first time...");
     }
     
-    //UIUserNotificationSettings *notifSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound) categories:nil];
-    //[[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
-    //[[UIApplication sharedApplication] registerForRemoteNotifications];
+    UIUserNotificationSettings *notifSettings = [UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeAlert | UIUserNotificationTypeBadge | UIUserNotificationTypeSound) categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:notifSettings];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
     
     LoginViewController *controller = [[LoginViewController alloc] initWithNibName:@"LoginViewController" bundle:nil];
     
@@ -117,6 +118,12 @@ BOOL loggedIn = NO;
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
     NSLog(@"Received notification: %@", userInfo);
+    
+    //NSDictionary *temp = [userInfo objectForKey:@"aps"];
+    
+    MessagesViewController *controller = [[MessagesViewController alloc] initWithNibName:@"MessagesViewController" bundle:nil];
+    
+    [self.navController pushViewController:controller animated:NO];
 }
 
 @end

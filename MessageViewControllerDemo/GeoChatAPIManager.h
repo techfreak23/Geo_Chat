@@ -14,7 +14,11 @@
 
 - (NSMutableDictionary *)userInfo;
 
+- (void)setUpClient;
+- (void)disconnectClient;
+
 - (void)loginWithAssertion:(NSString *)assertion;
+- (void)updateUsername:(NSString *)username;
 - (void)logout;
 - (void)fetchRoomsForLatitude:(NSString *)latitude longitude:(NSString *)longitude;
 - (void)fetchRoomForID:(NSString *)roomID;
